@@ -1,0 +1,349 @@
+{
+  "_readme": "קובץ נתונים של I'mvest Dashboard. עדכני ידנית כל שבוע, או ייצאי מ-Google Sheets ושמרי כ-data.json באותה תיקייה.",
+  "_version": "2.0",
+  "lastUpdated": "2026-05-03",
+  "goals": [
+    {
+      "month": "מאי 2026",
+      "id": "may26",
+      "cls": "m-may",
+      "revenueTarget": 10000,
+      "coachingTarget": "2-3",
+      "workshopSeats": 15,
+      "communityNew": 50,
+      "weeklyLeads": 25,
+      "adSpendBudget": 500,
+      "maxCoachingPerWeek": 5,
+      "priorities": "10 שיחות/שבוע | דף מכירה חד | סילבוס סדנה | Call Insights Agent",
+      "notes": "שבוע מעבר – יישור למבנה חדש. CPL ~25₪.",
+      "onTrack": "unknown"
+    },
+    {
+      "month": "יוני 2026",
+      "id": "jun26",
+      "cls": "m-jun",
+      "revenueTarget": 15000,
+      "coachingTarget": "3-4",
+      "workshopSeats": 20,
+      "communityNew": 80,
+      "weeklyLeads": 60,
+      "adSpendBudget": 1200,
+      "maxCoachingPerWeek": 5,
+      "priorities": "סקלינג ליווי | קהילה | Gmail Agent",
+      "notes": "מכירות + תוכן מדד",
+      "onTrack": "unknown"
+    },
+    {
+      "month": "יולי 2026",
+      "id": "jul26",
+      "cls": "m-jul",
+      "revenueTarget": 20000,
+      "coachingTarget": "5",
+      "workshopSeats": 25,
+      "communityNew": 100,
+      "weeklyLeads": 80,
+      "adSpendBudget": 1500,
+      "maxCoachingPerWeek": 5,
+      "priorities": "מערכת מלאה | יעד 20K | MVP תודעה בנקאית",
+      "notes": "הוכחת מודל",
+      "onTrack": "unknown"
+    }
+  ],
+  "weeks": {
+    "2026-05-03": {
+      "_label": "ספרינט 3–8 מאי 2026 — דחיפה למכירות + בניית סדנה",
+      "sprintTitle": "ספרינט 3–8.5.26 — 10 שיחות | דף מכירה חד | סדנת MVP V1",
+      "targets": {
+        "visitors": 100,
+        "leads": 25,
+        "calls": 10,
+        "sales": 4,
+        "pageDirectSales": 2,
+        "salesFromCalls": 2,
+        "adSpend": 500,
+        "hoursCoaching": 6,
+        "instaPosts": 2,
+        "needleTasks": 3,
+        "communityNew": 0,
+        "communityActiveEvents": 0
+      },
+      "metrics": {
+        "visitorsActual": 0,
+        "leadsActual": 0,
+        "callsActual": 0,
+        "salesActual": 0,
+        "pageDirectSalesActual": 0,
+        "salesFromCallsActual": 0,
+        "revenueActual": 0,
+        "adSpendActual": 0,
+        "instaPostsActual": 0,
+        "communityNewActual": 0,
+        "communityActiveEventsActual": 0,
+        "communityFocusWeek": ""
+      },
+      "hours": {
+        "coaching": 0,
+        "content": 0,
+        "infra": 0,
+        "needleMover": 0,
+        "reflection": 0
+      },
+      "tasks": [
+        {
+          "text": "10 שיחות מכירה איכותיות השבוע",
+          "detail": "מטרה: 2–3 ליווים חדשים. מדידה: ספירה ביומן/CRM.",
+          "status": "todo",
+          "priority": 1
+        },
+        {
+          "text": "שכתוב כותרת + פתיח דף מכירה לליווי",
+          "detail": "מטרה: 1–2 רכישות ישירות מהעמוד. מדידה: גרסה חי באוויר.",
+          "status": "todo",
+          "priority": 2
+        },
+        {
+          "text": "סיום מבנה סדנת MVP + דף מכירה בסיסי V1",
+          "detail": "מטרה: להציע סדנה בשיחות ובמודעות שבוע הבא. מדידה: קובץ סדנה + טקסט לדף.",
+          "status": "todo",
+          "priority": 3
+        }
+      ],
+      "infraTask": {
+        "text": "Call Insights Agent V1 – הגדרה + הרצת שיחה מוקלטת אחת",
+        "detail": "חומר לקופי ותוכן ישירות מהשיחות.",
+        "status": "todo"
+      },
+      "gmailTask": {
+        "text": "מיון + מענה לאינבוקס (15 דק' אדמין – שישי)",
+        "status": "todo"
+      },
+      "communityTask": {
+        "text": "",
+        "status": "todo"
+      },
+      "reflection": {
+        "done": false,
+        "summary": "",
+        "bottleneck": "",
+        "onTrackTo20K": "unknown",
+        "notes": "יעדים: 25 לידים | 10–12 שיחות | 2–3 ליווים | סדנה V1 באוויר."
+      },
+      "flowTasks": [
+        {
+          "name": "ניתוח שבוע קודם + הגדרת יעדי השבוע (KPI + Needle Tasks)",
+          "cat": "focus_a",
+          "day": 0,
+          "block": "morning_focus",
+          "time": "10:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "שכתוב כותרת + פתיח דף המכירה לליווי",
+          "cat": "focus_a",
+          "day": 0,
+          "block": "morning_focus",
+          "time": "11:30",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "3 שיחות מכירה ראשונות השבוע",
+          "cat": "focus_a",
+          "day": 0,
+          "block": "evening_focus",
+          "time": "17:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "שיחות מכירה – 3 לידים חמים",
+          "cat": "focus_a",
+          "day": 1,
+          "block": "morning_focus",
+          "time": "10:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "ליווי – פגישות אישיות (חלק מ-6 שעות)",
+          "cat": "coaching",
+          "day": 1,
+          "block": "soft_afternoon",
+          "time": "13:30",
+          "dur": 2,
+          "status": "todo"
+        },
+        {
+          "name": "סדנת MVP – מבנה / מצגת בסיסית",
+          "cat": "focus_a",
+          "day": 1,
+          "block": "evening_focus",
+          "time": "17:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "פגישות ליווי – 4 שעות (השלמת 6 שעות שבועיות)",
+          "cat": "coaching",
+          "day": 2,
+          "block": "morning_focus",
+          "time": "10:00",
+          "dur": 4,
+          "status": "todo"
+        },
+        {
+          "name": "תוכן אינסטגרם – פוסט וידאו + פוסט כתוב (תכנון/אישור)",
+          "cat": "content",
+          "day": 2,
+          "block": "soft_afternoon",
+          "time": "13:30",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "שיחות מכירה – 2–3 נוספות",
+          "cat": "focus_a",
+          "day": 2,
+          "block": "evening_focus",
+          "time": "17:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "תשתית: Call Insights Agent / שיפור דשבורד",
+          "cat": "infra",
+          "day": 3,
+          "block": "morning_focus",
+          "time": "08:30",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "שיחות מכירה / פולואפ לידים שלא סגרו",
+          "cat": "focus_a",
+          "day": 3,
+          "block": "morning_focus",
+          "time": "10:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "דף מכירה לסדנת MVP – כתיבה V1",
+          "cat": "focus_a",
+          "day": 3,
+          "block": "evening_focus",
+          "time": "17:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "שיחות מכירה + סגירת לידים חמים",
+          "cat": "focus_a",
+          "day": 4,
+          "block": "morning_focus",
+          "time": "10:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "העלאת פוסט אינסטגרם (כתוב או וידאו)",
+          "cat": "content",
+          "day": 4,
+          "block": "soft_afternoon",
+          "time": "13:30",
+          "dur": 1,
+          "status": "todo"
+        },
+        {
+          "name": "סדנה – השלמת חומרים / עדכון דף מכירה",
+          "cat": "focus_a",
+          "day": 4,
+          "block": "evening_focus",
+          "time": "17:00",
+          "dur": 1.5,
+          "status": "todo"
+        },
+        {
+          "name": "Weekly_Data + NeedleMover – מילוי נתונים + הגדרת מחט לשבוע הבא",
+          "cat": "infra",
+          "day": 5,
+          "block": "soft_morning",
+          "time": "09:00",
+          "dur": 0.75,
+          "status": "todo"
+        },
+        {
+          "name": "תשתית קלה (Agent / Gmail / דשבורד)",
+          "cat": "infra",
+          "day": 5,
+          "block": "soft_morning",
+          "time": "09:45",
+          "dur": 0.5,
+          "status": "todo"
+        },
+        {
+          "name": "סגירת שני פוסטי אינסטגרם לשבוע (אם לא נסגרו)",
+          "cat": "content",
+          "day": 5,
+          "block": "soft_morning",
+          "time": "10:15",
+          "dur": 0.5,
+          "status": "todo"
+        },
+        {
+          "name": "ריפלקציה שבועית (חובה!) – בדשבורד או מסמך נפרד",
+          "cat": "reflection",
+          "day": 5,
+          "block": "soft_morning",
+          "time": "10:45",
+          "dur": 0.5,
+          "status": "todo"
+        },
+        {
+          "name": "ספייר / סגירת קצוות",
+          "cat": "admin",
+          "day": 5,
+          "block": "soft_morning",
+          "time": "11:15",
+          "dur": 0.75,
+          "status": "todo"
+        }
+      ]
+    }
+  },
+  "_automationRoadmap": {
+    "step1": {
+      "title": "Meta Ads API",
+      "icon": "📢",
+      "desc": "שליפה אוטומטית של לידים + הוצאות פרסום",
+      "status": "pending",
+      "action": "צרי Meta App ב-developers.facebook.com · שמרי: App ID + Long-lived Access Token + Ad Account ID",
+      "impact": "לידים + adSpend מתעדכנים אוטומטית מדי שבוע"
+    },
+    "step2": {
+      "title": "Supabase",
+      "icon": "🗄️",
+      "desc": "שמירת כל הנתונים בענן — גישה מכל מכשיר",
+      "status": "pending",
+      "action": "פרויקט חינמי ב-supabase.com · שמרי: Project URL + Anon Key",
+      "impact": "גיבוי אוטומטי, גישה ממובייל, היסטוריה מלאה"
+    },
+    "step3": {
+      "title": "NeedleMover Agent",
+      "icon": "🧠",
+      "desc": "כל ראשון: ניתוח + המלצת 3 משימות אוטומטית",
+      "status": "pending",
+      "action": "Anthropic API Key + Supabase מחובר (שלב 2 קודם)",
+      "impact": "ראשון 08:00 — הדשבורד מוכן עם תוכנית לשבוע"
+    },
+    "step4": {
+      "title": "Gmail Agent",
+      "icon": "📧",
+      "desc": "סיווג ותגובה אוטומטית למיילים נכנסים",
+      "status": "pending",
+      "action": "OAuth Gmail (Google Cloud Console) + Make/Zapier Webhook",
+      "impact": "חיסכון 30+ דק'/יום, תיבה מסודרת"
+    }
+  }
+}

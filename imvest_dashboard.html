@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I'mvest Dashboard</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --sb:#1c1f3b;--sb2:#2a2e50;--acc:#0073ea;--acc2:#ddeeff;
+      --grn:#00c875;--org:#fdab3d;--red:#e2445c;--pur:#a25ddc;--gld:#c9a84c;
+      --bg:#f6f7fb;--card:#fff;--brd:#e6e9ef;--txt:#323338;--txt2:#676879;--hdr:#f5f6f8;
+    }
+    body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--txt);display:flex;min-height:100vh;font-size:14px}
+
+    .sb{width:210px;min-width:210px;background:var(--sb);color:#fff;display:flex;flex-direction:column;
+        position:fixed;right:0;top:0;bottom:0;z-index:100;overflow-y:auto}
+    .sb-logo{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.1)}
+    .sb-logo .brand{font-size:17px;font-weight:800}
+    .sb-logo .sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+    .sb-sec{padding:12px 14px 3px;font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.7px}
+    .nav{padding:6px}
+    .ni{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:6px;cursor:pointer;
+        transition:background .15s;font-size:13px;color:rgba(255,255,255,.72);margin-bottom:1px;user-select:none}
+    .ni:hover{background:var(--sb2)} .ni.active{background:var(--acc);color:#fff;font-weight:700}
+    .ni .ico{font-size:14px}
+    .sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid rgba(255,255,255,.1);font-size:10px;color:rgba(255,255,255,.3)}
+
+    .main{margin-right:210px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:#fff;border-bottom:1px solid var(--brd);padding:11px 22px;display:flex;
+            align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar-l .pg-title{font-size:18px;font-weight:800}
+    .topbar-l .pg-sub{font-size:11px;color:var(--txt2);margin-top:1px}
+    .topbar-r{display:flex;gap:8px;align-items:center}
+    .content{flex:1;padding:20px 22px}
+
+    .btn{padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .15s;font-family:inherit}
+    .btn-acc{background:var(--acc);color:#fff} .btn-acc:hover{background:#0060c0}
+    .btn-grn{background:var(--grn);color:#fff} .btn-grn:hover{background:#00a85f}
+    .btn-out{background:transparent;color:var(--acc);border:1.5px solid var(--acc)} .btn-out:hover{background:var(--acc2)}
+    .btn-sm{padding:5px 10px;font-size:12px}
+    .btn-ghost{background:transparent;color:var(--txt2);border:1px solid var(--brd)} .btn-ghost:hover{border-color:var(--acc);color:var(--acc)}
+
+    .tab-panel{display:none} .tab-panel.active{display:block}
+
+    .card{background:var(--card);border-radius:10px;border:1px solid var(--brd);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:14px}
+    .card-hdr{background:var(--hdr);padding:10px 18px;font-weight:800;font-size:13px;border-bottom:1px solid var(--brd);
+              display:flex;align-items:center;gap:8px;justify-content:space-between;border-radius:10px 10px 0 0}
+
+    /* KPI cards */
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;margin-bottom:18px}
+    .kpi{background:var(--card);border-radius:10px;padding:14px 15px;border:1px solid var(--brd);
+         box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer;transition:box-shadow .2s;position:relative}
+    .kpi:hover{box-shadow:0 4px 14px rgba(0,0,0,.1)}
+    .kpi-lbl{font-size:11px;color:var(--txt2);font-weight:600;margin-bottom:7px}
+    .kpi-val{font-size:26px;font-weight:900;line-height:1}
+    .kpi-tgt{font-size:11px;color:var(--txt2);margin-top:4px}
+    .kpi-bar{height:4px;background:var(--brd);border-radius:2px;margin-top:9px;overflow:hidden}
+    .kpi-fill{height:100%;border-radius:2px;transition:width .4s}
+    .kpi-edit{position:absolute;top:8px;left:10px;font-size:18px;cursor:pointer;opacity:0;transition:opacity .2s}
+    .kpi:hover .kpi-edit{opacity:.5}
+
+    /* Quick update */
+    .qu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1px;background:var(--brd)}
+    .qu-field{background:var(--card);padding:13px 15px}
+    .qu-lbl{font-size:10px;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+    .qu-inp{font-size:24px;font-weight:900;width:100%;border:none;background:transparent;font-family:inherit;color:var(--txt);direction:rtl}
+    .qu-inp:focus{outline:2px solid var(--acc);border-radius:4px;background:#fffde7}
+    .qu-unit{font-size:11px;color:var(--txt2);margin-top:3px}
+    .qu-bar{height:4px;background:var(--brd);border-radius:2px;margin-top:7px;overflow:hidden}
+    .qu-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+
+    /* hours */
+    .hrs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1px;background:var(--brd)}
+    .hrs-field{background:var(--card);padding:12px 15px}
+    .hrs-lbl{font-size:10px;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+    .hrs-inp{font-size:20px;font-weight:900;width:80px;border:none;background:transparent;font-family:inherit;color:var(--txt)}
+    .hrs-inp:focus{outline:2px solid var(--acc);border-radius:4px;background:#fffde7}
+    .mini-bar{height:4px;background:var(--brd);border-radius:2px;margin-top:6px;overflow:hidden}
+    .mini-fill{height:100%;border-radius:2px;transition:width .3s}
+
+    /* section header */
+    .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:18px 0 11px}
+    .sec-hdr:first-child{margin-top:0}
+    .sec-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px}
+
+    /* table */
+    .tbl-wrap{background:var(--card);border-radius:10px;border:1px solid var(--brd);overflow-x:auto;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    thead tr{background:var(--hdr)}
+    th{padding:9px 13px;text-align:right;font-weight:700;color:var(--txt2);font-size:11px;text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid var(--brd);white-space:nowrap}
+    td{padding:9px 13px;border-bottom:1px solid var(--brd);vertical-align:middle}
+    tr:last-child td{border-bottom:none} tr:hover td{background:#f8f9ff}
+    .ed-n{background:transparent;border:none;width:70px;font-size:13px;font-family:inherit;color:var(--txt);text-align:center}
+    .ed-n:focus{outline:2px solid var(--acc);border-radius:4px;background:#fffde7}
+    .ed-t{background:transparent;border:none;font-size:13px;font-family:inherit;color:var(--txt);width:100%}
+    .ed-t:focus{outline:2px solid var(--acc);border-radius:4px;background:#fffde7;padding:2px 4px}
+
+    /* badges */
+    .badge{display:inline-block;padding:3px 9px;border-radius:11px;font-size:11px;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap;transition:opacity .15s}
+    .badge:hover{opacity:.8}
+    .b-todo{background:#c4c4c4;color:#fff} .b-prog{background:var(--acc);color:#fff}
+    .b-done{background:var(--grn);color:#fff} .b-blok{background:var(--red);color:#fff}
+    .b-unk{background:#c4c4c4;color:#fff} .b-on{background:var(--grn);color:#fff}
+    .b-risk{background:var(--org);color:#fff} .b-off{background:var(--red);color:#fff}
+    .m-may td:first-child{border-right:3px solid var(--acc)}
+    .m-jun td:first-child{border-right:3px solid var(--pur)}
+    .m-jul td:first-child{border-right:3px solid var(--grn)}
+
+    /* task rows */
+    .task-row{display:flex;align-items:flex-start;gap:9px;padding:11px 18px;border-bottom:1px solid var(--brd)}
+    .task-row:last-child{border-bottom:none}
+    .task-num{width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;font-size:11px;font-weight:800;
+              display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .task-body{flex:1}
+    .task-inp{width:100%;font-size:13px;border:none;background:transparent;font-family:inherit;color:var(--txt);font-weight:600}
+    .task-inp:focus{outline:2px solid var(--acc);border-radius:4px;background:#fffde7;padding:2px 5px}
+    .task-detail{font-size:11px;color:var(--txt2);margin-top:3px;line-height:1.5}
+    .task-lbl{font-size:12px;font-weight:700;color:var(--txt2);min-width:100px;flex-shrink:0}
+
+    /* flow */
+    .flow-scroll{overflow-x:auto;padding-bottom:6px}
+    .flow-grid{display:grid;grid-template-columns:repeat(6,minmax(162px,1fr));gap:10px;min-width:980px}
+    .flow-day{background:var(--card);border-radius:10px;border:1px solid var(--brd);overflow:hidden}
+    .flow-hdr{background:var(--sb);color:#fff;padding:8px 12px;font-weight:700;font-size:13px;text-align:center;
+              display:flex;align-items:center;justify-content:center;gap:6px}
+    .flow-count{background:rgba(255,255,255,.2);border-radius:8px;padding:1px 6px;font-size:10px}
+    .flow-body{padding:7px;min-height:140px}
+    .flow-task{background:var(--bg);border-radius:6px;padding:7px 9px;margin-bottom:6px;
+               border-right:3px solid var(--brd);cursor:pointer;transition:box-shadow .15s}
+    .flow-task:hover{box-shadow:0 2px 7px rgba(0,0,0,.1)}
+    .ft-focus_a{border-right-color:var(--acc)} .ft-coaching{border-right-color:var(--pur)}
+    .ft-content{border-right-color:var(--org)} .ft-infra{border-right-color:var(--grn)}
+    .ft-reflection{border-right-color:var(--gld)} .ft-admin{border-right-color:#b0b3c4} .ft-community{border-right-color:#e75480}
+    .ft-done{opacity:.55;text-decoration:line-through}
+    .ft-name{font-size:11.5px;font-weight:700;margin-bottom:3px}
+    .ft-meta{font-size:10px;color:var(--txt2);display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+    .ft-time{font-size:10px;color:var(--acc);font-weight:700}
+    .add-row{display:flex;align-items:center;gap:4px;color:var(--txt2);font-size:12px;cursor:pointer;
+             padding:4px 7px;border-radius:4px;transition:background .15s}
+    .add-row:hover{background:var(--brd);color:var(--acc)}
+    .ft-actions{display:flex;gap:2px;margin-top:4px;opacity:0;transition:opacity .15s}
+    .flow-task:hover .ft-actions{opacity:1}
+    .ft-btn{background:none;border:none;cursor:pointer;font-size:11px;padding:2px 5px;border-radius:3px;line-height:1;color:var(--txt2)}
+    .ft-btn:hover{background:var(--brd);color:var(--acc)}
+    .ft-btn-ph{display:inline-block;width:22px}
+    .ft-edit-form{margin-top:7px;border-top:1px solid var(--brd);padding-top:7px}
+    .ft-ei{width:100%;border:1px solid var(--brd);border-radius:4px;padding:4px 7px;font-size:11px;font-family:inherit;margin-bottom:5px;background:var(--bg);color:var(--txt);direction:rtl}
+    .ft-ei:focus{outline:2px solid var(--acc);background:#fffde7}
+    .ft-ei-row{display:flex;gap:5px;margin-bottom:5px}
+    .ft-ei-sm{flex:1;min-width:0}
+
+    /* sprint */
+    .sp-title-input{width:100%;font-size:14px;font-weight:700;border:none;background:transparent;
+                    font-family:inherit;color:var(--txt);padding:12px 18px;direction:rtl}
+    .sp-title-input:focus{outline:2px solid var(--acc);background:#fffde7;border-radius:4px}
+
+    /* roadmap */
+    .roadmap{background:var(--card);border-radius:10px;border:2px solid var(--org);margin-bottom:18px;overflow:hidden}
+    .roadmap-hdr{background:#fff8ed;padding:11px 18px;font-weight:800;font-size:13px;border-bottom:1px solid #ffe0a0;color:#7a5c00}
+    .roadmap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+    .roadmap-step{padding:14px 18px;border-left:1px solid var(--brd);border-bottom:1px solid var(--brd)}
+    .step-num{font-size:10px;font-weight:800;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .step-title{font-size:14px;font-weight:800;margin-bottom:4px}
+    .step-desc{font-size:12px;color:var(--txt2);margin-bottom:7px;line-height:1.5}
+    .step-action{background:#fff8ed;border:1px solid #ffe0a0;border-radius:6px;padding:7px 10px;font-size:11px;color:#7a5c00;line-height:1.5}
+    .step-impact{font-size:11px;color:var(--grn);font-weight:700;margin-top:7px}
+
+    /* data status */
+    .data-bar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--brd);
+              border-radius:8px;padding:7px 14px;margin-bottom:14px;font-size:12px}
+    .data-dot{width:8px;height:8px;border-radius:50%;background:var(--grn);flex-shrink:0}
+    .data-dot.warn{background:var(--org)} .data-dot.err{background:var(--red)}
+
+    /* reflection */
+    .ref-wrap{padding:14px 18px;display:flex;flex-direction:column;gap:12px}
+    .ref-lbl{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;margin-bottom:4px}
+    textarea.ref-ta{width:100%;height:80px;border:1px solid var(--brd);border-radius:8px;
+                    padding:8px 12px;font-family:inherit;font-size:13px;resize:vertical;direction:rtl}
+    textarea.ref-ta:focus{outline:2px solid var(--acc);border-color:var(--acc)}
+    input.ref-in{width:100%;border:1px solid var(--brd);border-radius:6px;padding:7px 12px;font-family:inherit;font-size:13px;direction:rtl}
+    input.ref-in:focus{outline:2px solid var(--acc);border-color:var(--acc)}
+
+    /* legend */
+    .legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:11px}
+    .leg-item{display:flex;align-items:center;gap:5px;font-size:12px}
+    .leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+    /* modal */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+    .modal-bg.open{display:flex}
+    .modal-box{background:#fff;border-radius:12px;padding:22px;width:370px;direction:rtl}
+    .modal-title{font-size:15px;font-weight:800;margin-bottom:14px}
+    .mf{margin-bottom:11px}
+    .ml{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;margin-bottom:4px}
+    .mi{width:100%;border:1px solid var(--brd);border-radius:6px;padding:7px 11px;font-family:inherit;font-size:13px;direction:rtl}
+    .mi:focus{outline:2px solid var(--acc);border-color:var(--acc)}
+    .modal-btns{display:flex;gap:8px;margin-top:14px}
+
+    /* progress ring (needle tasks) */
+    .ring-wrap{display:flex;align-items:center;gap:8px}
+    .ring-dot{width:10px;height:10px;border-radius:50%;background:var(--brd)}
+    .ring-dot.done{background:var(--grn)} .ring-dot.prog{background:var(--acc)}
+
+    /* toast */
+    .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+           background:var(--grn);color:#fff;padding:9px 22px;border-radius:30px;font-size:13px;
+           font-weight:700;z-index:999;opacity:0;transition:all .3s;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:#eee}
+    ::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px}
+  </style>
+</head>
+<body>
+<script id="embedded-data" type="application/json">
+{
+  "_readme": "נתונים מוטמעים. עדכן כאן ו/או ב-data.json.",
+  "_version": "2.0",
+  "lastUpdated": "2026-05-02",
+  "goals": [
+    {"month":"מאי 2026","id":"may26","cls":"m-may","revenueTarget":10000,"coachingTarget":"2-3","workshopSeats":15,"communityNew":50,"weeklyLeads":25,"adSpendBudget":500,"maxCoachingPerWeek":5,"priorities":"10 שיחות/שבוע | דף מכירה חד | סילבוס סדנה | Call Insights Agent","notes":"שבוע מעבר – יישור למבנה חדש. CPL ~25₪.","onTrack":"unknown"},
+    {"month":"יוני 2026","id":"jun26","cls":"m-jun","revenueTarget":15000,"coachingTarget":"3-4","workshopSeats":20,"communityNew":80,"weeklyLeads":60,"adSpendBudget":1200,"maxCoachingPerWeek":5,"priorities":"סקלינג ליווי | קהילה | Gmail Agent","notes":"מכירות + תוכן מדד","onTrack":"unknown"},
+    {"month":"יולי 2026","id":"jul26","cls":"m-jul","revenueTarget":20000,"coachingTarget":"5","workshopSeats":25,"communityNew":100,"weeklyLeads":80,"adSpendBudget":1500,"maxCoachingPerWeek":5,"priorities":"מערכת מלאה | יעד 20K | MVP תודעה בנקאית","notes":"הוכחת מודל","onTrack":"unknown"}
+  ],
+  "weeks": {
+    "2026-05-03": {
+      "_label": "ספרינט 3–8 מאי 2026",
+      "sprintTitle": "ספרינט 3–8.5.26 — 10 שיחות | דף מכירה חד | סדנת MVP V1",
+      "targets": {"visitors":100,"leads":25,"calls":10,"sales":4,"pageDirectSales":2,"salesFromCalls":2,"adSpend":500,"hoursCoaching":6,"instaPosts":2,"needleTasks":3,"communityNew":0,"communityActiveEvents":0},
+      "metrics": {"visitorsActual":0,"leadsActual":0,"callsActual":0,"salesActual":0,"pageDirectSalesActual":0,"salesFromCallsActual":0,"revenueActual":0,"adSpendActual":0,"instaPostsActual":0,"communityNewActual":0,"communityActiveEventsActual":0,"communityFocusWeek":""},
+      "hours": {"coaching":0,"content":0,"infra":0,"needleMover":0,"reflection":0},
+      "tasks": [
+        {"text":"10 שיחות מכירה איכותיות השבוע","detail":"מטרה: 2–3 ליווים חדשים. מדידה: ספירה ביומן/CRM.","status":"todo","priority":1},
+        {"text":"שכתוב כותרת + פתיח דף מכירה לליווי","detail":"מטרה: 1–2 רכישות ישירות מהעמוד. מדידה: גרסה חי באוויר.","status":"todo","priority":2},
+        {"text":"סיום מבנה סדנת MVP + דף מכירה בסיסי V1","detail":"מטרה: להציע סדנה בשיחות ובמודעות שבוע הבא.","status":"todo","priority":3}
+      ],
+      "infraTask": {"text":"Call Insights Agent V1 – הגדרה + הרצת שיחה מוקלטת אחת","detail":"חומר לקופי ותוכן מהשיחות.","status":"todo"},
+      "gmailTask": {"text":"מיון + מענה לאינבוקס (15 דק' אדמין – שישי)","status":"todo"},
+      "communityTask": {"text":"","status":"todo"},
+      "reflection": {"done":false,"summary":"","bottleneck":"","onTrackTo20K":"unknown","notes":"יעדים: 25 לידים | 10–12 שיחות | 2–3 ליווים | סדנה V1 באוויר."},
+      "flowTasks": [
+        {"name":"ניתוח שבוע קודם + הגדרת יעדי השבוע (KPI + Needle Tasks)","cat":"focus_a","day":0,"block":"morning_focus","time":"10:00","dur":1.5,"status":"todo"},
+        {"name":"שכתוב כותרת + פתיח דף המכירה לליווי","cat":"focus_a","day":0,"block":"morning_focus","time":"11:30","dur":1.5,"status":"todo"},
+        {"name":"3 שיחות מכירה ראשונות השבוע","cat":"focus_a","day":0,"block":"evening_focus","time":"17:00","dur":1.5,"status":"todo"},
+        {"name":"שיחות מכירה – 3 לידים חמים","cat":"focus_a","day":1,"block":"morning_focus","time":"10:00","dur":1.5,"status":"todo"},
+        {"name":"ליווי – פגישות אישיות (חלק מ-6 שעות)","cat":"coaching","day":1,"block":"soft_afternoon","time":"13:30","dur":2,"status":"todo"},
+        {"name":"סדנת MVP – מבנה / מצגת בסיסית","cat":"focus_a","day":1,"block":"evening_focus","time":"17:00","dur":1.5,"status":"todo"},
+        {"name":"פגישות ליווי – 4 שעות (השלמת 6 שעות שבועיות)","cat":"coaching","day":2,"block":"morning_focus","time":"10:00","dur":4,"status":"todo"},
+        {"name":"תוכן אינסטגרם – פוסט וידאו + פוסט כתוב (תכנון/אישור)","cat":"content","day":2,"block":"soft_afternoon","time":"13:30","dur":1.5,"status":"todo"},
+        {"name":"שיחות מכירה – 2–3 נוספות","cat":"focus_a","day":2,"block":"evening_focus","time":"17:00","dur":1.5,"status":"todo"},
+        {"name":"תשתית: Call Insights Agent / שיפור דשבורד","cat":"infra","day":3,"block":"morning_focus","time":"08:30","dur":1.5,"status":"todo"},
+        {"name":"שיחות מכירה / פולואפ לידים שלא סגרו","cat":"focus_a","day":3,"block":"morning_focus","time":"10:00","dur":1.5,"status":"todo"},
+        {"name":"דף מכירה לסדנת MVP – כתיבה V1","cat":"focus_a","day":3,"block":"evening_focus","time":"17:00","dur":1.5,"status":"todo"},
+        {"name":"שיחות מכירה + סגירת לידים חמים","cat":"focus_a","day":4,"block":"morning_focus","time":"10:00","dur":1.5,"status":"todo"},
+        {"name":"העלאת פוסט אינסטגרם (כתוב או וידאו)","cat":"content","day":4,"block":"soft_afternoon","time":"13:30","dur":1,"status":"todo"},
+        {"name":"סדנה – השלמת חומרים / עדכון דף מכירה","cat":"focus_a","day":4,"block":"evening_focus","time":"17:00","dur":1.5,"status":"todo"},
+        {"name":"Weekly_Data + NeedleMover – מילוי נתונים + הגדרת מחט לשבוע הבא","cat":"infra","day":5,"block":"soft_morning","time":"09:00","dur":0.75,"status":"todo"},
+        {"name":"תשתית קלה (Agent / Gmail / דשבורד)","cat":"infra","day":5,"block":"soft_morning","time":"09:45","dur":0.5,"status":"todo"},
+        {"name":"סגירת שני פוסטי אינסטגרם לשבוע (אם לא נסגרו)","cat":"content","day":5,"block":"soft_morning","time":"10:15","dur":0.5,"status":"todo"},
+        {"name":"ריפלקציה שבועית (חובה!) – בדשבורד או מסמך נפרד","cat":"reflection","day":5,"block":"soft_morning","time":"10:45","dur":0.5,"status":"todo"},
+        {"name":"ספייר / סגירת קצוות","cat":"admin","day":5,"block":"soft_morning","time":"11:15","dur":0.75,"status":"todo"}
+      ]
+    }
+  }
+}
+</script>
+
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="brand">I'mvest</div>
+    <div class="sub">תודעה בנקאית | ניהול עסקי</div>
+  </div>
+  <div class="nav">
+    <div class="sb-sec">מעקב יומי</div>
+    <div class="ni active" id="n-update"     onclick="go('update',this)"><span class="ico">⚡</span> עדכון מהיר</div>
+    <div class="ni"        id="n-kpi"        onclick="go('kpi',this)"><span class="ico">📊</span> KPI שבועי</div>
+    <div class="sb-sec">תכנון</div>
+    <div class="ni"        id="n-sprint"     onclick="go('sprint',this)"><span class="ico">🏃</span> ספרינט</div>
+    <div class="ni"        id="n-flow"       onclick="go('flow',this)"><span class="ico">🗓️</span> זרימה יומית</div>
+    <div class="ni"        id="n-goals"      onclick="go('goals',this)"><span class="ico">🎯</span> יעדים חודשיים</div>
+    <div class="sb-sec">מערכת</div>
+    <div class="ni"        id="n-roadmap"    onclick="go('roadmap',this)"><span class="ico">🔧</span> מפת דרכים</div>
+    <div class="ni"        id="n-principles" onclick="go('principles',this)"><span class="ico">📐</span> עקרונות</div>
+  </div>
+  <div class="sb-footer">
+    I'mvest © 2026 | אביה פארן<br>
+    <span id="sb-save-time"></span>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-l">
+      <div class="pg-title" id="pg-title">עדכון מהיר</div>
+      <div class="pg-sub" id="pg-sub"></div>
+    </div>
+    <div class="topbar-r">
+      <button class="btn btn-ghost btn-sm" onclick="prevWeek()">→</button>
+      <span style="font-size:13px;font-weight:700;min-width:140px;text-align:center" id="wk-lbl"></span>
+      <button class="btn btn-ghost btn-sm" onclick="nextWeek()">←</button>
+      <button class="btn btn-ghost btn-sm" onclick="reloadFromServer()" title="טען מחדש מ-data.json">🔄 רענן</button>
+      <button class="btn btn-ghost btn-sm" onclick="importFile()">📥 ייבוא</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportJSON()">📤 ייצוא</button>
+      <button class="btn btn-grn" onclick="saveAll()">💾 שמור</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ QUICK UPDATE ══ -->
+    <div id="tab-update" class="tab-panel active">
+      <div class="data-bar">
+        <div class="data-dot" id="data-dot"></div>
+        <span id="data-status-txt">טוען...</span>
+        <span style="margin-right:auto;font-size:11px;color:var(--txt2)" id="data-saved-at"></span>
+        <a href="#" onclick="go('roadmap',document.getElementById('n-roadmap'));return false"
+           style="font-size:11px;color:var(--org);font-weight:700;margin-right:8px">🔧 נותר לאוטומציה →</a>
+      </div>
+
+      <div class="sec-hdr" style="margin-top:0">
+        <div class="sec-title">⚡ עדכון מהיר — שבוע <span id="qu-wk"></span></div>
+        <button class="btn btn-acc btn-sm" onclick="saveAll()">שמור</button>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">📊 8 מדדי KPI — עדכני כל יום</div>
+        <div class="qu-grid" id="qu-grid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">⏱️ שעות עבודה שבועיות</div>
+        <div class="hrs-grid" id="qu-hours"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">🎯 3 Needle Movers — סטטוס</div>
+        <div id="qu-tasks"></div>
+      </div>
+    </div>
+
+    <!-- ══ KPI ══ -->
+    <div id="tab-kpi" class="tab-panel">
+      <div class="sec-hdr" style="margin-top:0">
+        <div class="sec-title">📊 KPI שבועי — <span id="kpi-wk"></span></div>
+      </div>
+      <div class="kpi-grid" id="kpi-grid"></div>
+
+      <div class="card" style="border-color:#e75480">
+        <div class="card-hdr" style="background:#fff0f5;border-bottom-color:#f9c6d4">👥 קהילה — מעקב שבועי</div>
+        <div class="kpi-grid" id="kpi-community" style="padding:14px 16px 6px"></div>
+        <div style="padding:0 16px 14px">
+          <div class="qu-lbl" style="margin-bottom:5px">🎯 פוקוס קהילה השבוע</div>
+          <input id="community-focus-inp" class="ref-in" style="width:100%" placeholder="למשל: לבנות מבנה, לפתוח קבוצה, לכתוב תיאור הקהילה...">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">💰 הכנסה שבועית מצטברת — מאי 2026</div>
+        <div style="padding:18px 20px 12px">
+          <div id="rev-chart" style="display:flex;align-items:flex-end;gap:14px;height:90px"></div>
+          <div id="rev-lbl" style="font-size:11px;color:var(--txt2);margin-top:6px;text-align:center"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">🎯 סטטוס יעדים חודשיים</div>
+        <div id="goals-summary" style="padding:12px 18px"></div>
+      </div>
+    </div>
+
+    <!-- ══ SPRINT ══ -->
+    <div id="tab-sprint" class="tab-panel">
+      <div class="card">
+        <div class="card-hdr">🏃 כותרת ספרינט</div>
+        <input class="sp-title-input" id="sp-title-inp" placeholder="כותרת הספרינט...">
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">📊 מדדים</div>
+        <div class="hrs-grid" id="sp-metrics"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">⏱️ שעות (קיבולת מרבית: 11.5ש')</div>
+        <div class="hrs-grid" id="sp-hours"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">🎯 3 Needle Movers</div>
+        <div id="sp-tasks"></div>
+      </div>
+      <div class="card" style="border-color:#e75480">
+        <div class="card-hdr" style="background:#fff0f5;border-bottom-color:#f9c6d4">👥 מחט קהילה (פעם בשבועיים)</div>
+        <div id="sp-community"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">🤖 משימות תשתית ו-AI Agents</div>
+        <div id="sp-agents"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">🪞 רפלקציה שבועית (יום שישי)</div>
+        <div class="ref-wrap">
+          <div>
+            <div class="ref-lbl">ריפלקציה בוצעה?</div>
+            <span class="badge b-unk" id="ref-badge" onclick="cycleRef()">לא בוצע</span>
+          </div>
+          <div>
+            <div class="ref-lbl">סיכום ריפלקציה</div>
+            <textarea class="ref-ta" id="ref-txt" placeholder="מה עבד? מה לא? מה משנים?"></textarea>
+          </div>
+          <div>
+            <div class="ref-lbl">צוואר בקבוק עיקרי</div>
+            <input class="ref-in" id="ref-bnk" placeholder="מה עצר אותנו השבוע?">
+          </div>
+          <div>
+            <div class="ref-lbl">הערות ספרינט</div>
+            <input class="ref-in" id="sp-notes" placeholder="הערות כלליות...">
+          </div>
+          <div>
+            <div class="ref-lbl">On Track ל-20K יולי?</div>
+            <span class="badge b-unk" id="ot-badge" onclick="cycleOT()">לא ידוע</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FLOW ══ -->
+    <div id="tab-flow" class="tab-panel">
+      <div class="sec-hdr" style="margin-top:0">
+        <div class="sec-title">🗓️ זרימה יומית — <span id="flow-wk"></span></div>
+        <button class="btn btn-acc btn-sm" onclick="openModal(0)">+ מטלה</button>
+      </div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--acc)"></div> מחט / Focus A</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--pur)"></div> ליווי</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--org)"></div> תוכן</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--grn)"></div> תשתית</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--gld)"></div> ריפלקציה</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#b0b3c4"></div> אדמין</div>
+      </div>
+      <div id="flow-debug"></div>
+      <div class="flow-scroll">
+        <div class="flow-grid" id="flow-grid"></div>
+      </div>
+    </div>
+
+    <!-- ══ GOALS ══ -->
+    <div id="tab-goals" class="tab-panel">
+      <div class="sec-hdr" style="margin-top:0">
+        <div class="sec-title">🎯 יעדים חודשיים — מאי–יולי 2026</div>
+        <button class="btn btn-acc btn-sm" onclick="addGoal()">+ חודש</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th style="min-width:90px">חודש</th><th>הכנסה ₪</th><th>ליווי</th><th>סדנה</th>
+            <th>קהילה</th><th>לידים/שבוע</th><th>פרסום ₪/שבוע</th><th>מקס ליווי</th>
+            <th style="min-width:200px">עדיפויות</th><th style="min-width:140px">הערות</th><th>On Track</th>
+          </tr></thead>
+          <tbody id="goals-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ ROADMAP ══ -->
+    <div id="tab-roadmap" class="tab-panel">
+      <div class="sec-hdr" style="margin-top:0">
+        <div class="sec-title">🔧 מפת דרכים לאוטומציה מלאה</div>
+      </div>
+      <div style="background:#fff8ed;border:1px solid #ffe0a0;border-radius:8px;padding:11px 16px;
+                  font-size:13px;color:#7a5c00;margin-bottom:16px;line-height:1.7">
+        <strong>המצב כרגע:</strong> הדשבורד פועל עם הזנה ידנית + data.json מקומי.<br>
+        כל שלב עצמאי — בצעי לפי סדר עדיפויות. כשתהיי מוכנה, <strong>עדכני אותי והמערכת תתחבר.</strong>
+      </div>
+      <div class="roadmap" id="roadmap-panel"></div>
+      <div class="card">
+        <div class="card-hdr">📋 כיצד לעדכן data.json ידנית</div>
+        <div style="padding:14px 18px;font-size:13px;line-height:1.9;color:var(--txt2)">
+          <strong style="color:var(--txt)">עדכון שבועי (כל ראשון / שישי):</strong><br>
+          1. פתחי <code style="background:var(--bg);padding:1px 5px;border-radius:3px">CLAUDE/data.json</code> בכל עורך טקסט<br>
+          2. עדכני תחת <code style="background:var(--bg);padding:1px 5px;border-radius:3px">weeks → "2026-XX-XX" → metrics</code><br>
+          3. שמרי — הדשבורד יקרא אוטומטית בטעינה הבאה<br>
+          4. לשבוע חדש: העתיקי את מבנה השבוע הקיים, שני את התאריך<br><br>
+          <strong style="color:var(--txt)">חלופה עם Google Sheets:</strong><br>
+          שמרי גיליון עם אותן עמודות → ייצאי CSV → המרי ל-JSON → שמרי כ-data.json
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PRINCIPLES ══ -->
+    <div id="tab-principles" class="tab-panel">
+      <div class="sec-hdr" style="margin-top:0">
+        <div class="sec-title">📐 עקרונות ניהול</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:13px" id="principles-grid"></div>
+
+      <!-- שגרה שבועית -->
+      <div class="sec-hdr" style="margin-top:26px">
+        <div class="sec-title">🗓️ שגרה שבועית עם הדשבורד</div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;background:var(--brd)">
+
+          <div style="background:var(--card);padding:16px 18px">
+            <div style="font-size:12px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 KPI שבועי — חמישי / שישי</div>
+            <div style="font-size:12.5px;line-height:2;color:var(--txt)">
+              ✅ לעדכן: Visitors, Leads, Sales מהעמוד, Sales משיחות, ליווים, שעות, תקציב<br>
+              ✅ להסתכל על <strong>היחסים</strong>: Visitors→Leads, Leads→Sales<br>
+              ✅ לזהות <strong>Bottleneck אחד בלבד</strong> ולנסח אותו במשפט אחד<br>
+              <span style="background:#fff0f5;border-radius:5px;padding:3px 8px;font-size:11.5px;color:#c0245e;font-weight:700;display:inline-block;margin-top:4px">דוגמה: "Leads טוב, Sales נמוך → בעיה בשלב הסגירה."</span>
+            </div>
+          </div>
+
+          <div style="background:var(--card);padding:16px 18px;border-right:1px solid var(--brd)">
+            <div style="font-size:12px;font-weight:800;color:var(--pur);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🏃 ספרינט שבועי — אחרי KPI</div>
+            <div style="font-size:12.5px;line-height:2;color:var(--txt)">
+              ✅ להכניס את ה‑Bottleneck לשדה <strong>"צוואר בקבוק עיקרי"</strong> בלשונית ספרינט<br>
+              ✅ לקבוע <strong>3 Needle Tasks</strong> שמטפלות בו ישירות:<br>
+              <span style="padding-right:10px;color:var(--acc);font-weight:700">מחט 1</span> עמוד / קופי<br>
+              <span style="padding-right:10px;color:var(--pur);font-weight:700">מחט 2</span> תנועה / Visitors / Leads<br>
+              <span style="padding-right:10px;color:var(--grn);font-weight:700">מחט 3</span> סדנה / קהילה / מכירה<br>
+              ✅ לבחור <strong>Infra Task אחת בלבד</strong> אם יש זמן (אייג'נט / אוטומציה / דשבורד)
+            </div>
+          </div>
+
+          <div style="background:var(--card);padding:16px 18px;border-right:1px solid var(--brd)">
+            <div style="font-size:12px;font-weight:800;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🌊 זרימה יומית — Flow</div>
+            <div style="font-size:12.5px;line-height:2;color:var(--txt)">
+              ✅ לקחת 3 Needle Tasks + Infra Task ולפזר אותן לבלוקי פוקוס (בוקר/ערב)<br>
+              ✅ להוסיף בלוקים <strong>קבועים</strong> בכל שבוע:<br>
+              <span style="padding-right:10px">🟣</span> 6 שעות ליווי<br>
+              <span style="padding-right:10px">🟠</span> 3–4 שעות תוכן (כעת; אח"כ 1.5)<br>
+              <span style="padding-right:10px">🟢</span> 3–4 שעות תשתית (כעת; אח"כ 1.5)<br>
+              <span style="padding-right:10px">🟡</span> 0.5 שעות ריפלקציה — שישי בלבד
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- זיהוי Bottleneck -->
+      <div class="sec-hdr" style="margin-top:4px">
+        <div class="sec-title">🔍 איך לזהות Bottleneck מהמספרים</div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="padding:14px 18px 8px">
+          <div style="font-size:12px;color:var(--txt2);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">שאלה אחת: "באיזה שלב נשים עוצרות השבוע?"</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:9px">
+            <div style="background:#fff0f0;border-right:3px solid var(--red);border-radius:6px;padding:10px 13px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:4px">📭 Visitors נמוך</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.7">כל המספרים נמוכים<br>Bottleneck = <strong style="color:var(--red)">"אין מספיק תנועה לעמוד."</strong></div>
+            </div>
+            <div style="background:#fff5f0;border-right:3px solid var(--org);border-radius:6px;padding:10px 13px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:4px">👁️ Visitors גבוה, Leads נמוך</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.7">Visitors 100+, Leads 0–5<br>Bottleneck = <strong style="color:var(--org)">"העמוד לא הופך מבקר לליד."</strong></div>
+            </div>
+            <div style="background:#fffaf0;border-right:3px solid var(--gld);border-radius:6px;padding:10px 13px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:4px">🎯 Leads טוב, Sales נמוך</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.7">Leads 15–20, Sales 0–1<br>Bottleneck = <strong style="color:#b45309;">"שלב הסגירה לא עובד מספיק."</strong></div>
+            </div>
+            <div style="background:#f0fff4;border-right:3px solid var(--pur);border-radius:6px;padding:10px 13px">
+              <div style="font-size:12px;font-weight:800;margin-bottom:4px">🔥 Sales טובים, שחוקה</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.7">Coaching 3–4, שעות משוגעות<br>Bottleneck = <strong style="color:var(--pur)">"אין תשתית / אוטומציה סביב הליווי."</strong></div>
+            </div>
+          </div>
+          <div style="background:#f0f4ff;border-radius:7px;padding:11px 14px;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--acc)">
+            כל שבוע: ב‑KPI רואים באיזה שורה זה ← ב‑Sprint כותבים משפט אחד בשדה "צוואר בקבוק" ← 3 Needle Tasks נבחרות <em>רק</em> סביב זה.
+          </div>
+        </div>
+      </div>
+
+      <!-- לוח בקרה -->
+      <div class="sec-hdr" style="margin-top:26px">
+        <div class="sec-title">🎛️ לוח בקרה — פירוש מהיר ל-KPI</div>
+      </div>
+
+      <!-- משפטי זיכרון -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-hdr">💬 משפטי זיכרון</div>
+        <div style="padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px">
+          <div style="background:#f0f4ff;border-radius:8px;padding:11px 13px;font-size:13px;font-weight:700;color:var(--acc)">העמוד מוכר. השיחה סוגרת פערים — לא מחליפה את העמוד.</div>
+          <div style="background:#f0f4ff;border-radius:8px;padding:11px 13px;font-size:13px;font-weight:700;color:var(--acc)">Visitor = נכנסה לעמוד. Lead = הראתה כוונה אמיתית. Sale = שילמה.</div>
+          <div style="background:#f0f4ff;border-radius:8px;padding:11px 13px;font-size:13px;font-weight:700;color:var(--acc)">אני מכוונת ל-3–4 ליוויים חדשים בשבוע.</div>
+          <div style="background:#f0f4ff;border-radius:8px;padding:11px 13px;font-size:13px;font-weight:700;color:var(--acc)">אם המספרים לא זזים — אני מחפשת את צוואר הבקבוק, לא מאשימה את עצמי.</div>
+          <div style="background:#fff8e1;border-radius:8px;padding:11px 13px;font-size:13px;font-weight:700;color:#b45309;grid-column:1/-1">פעם בשבוע, בריפלקציה, אני בוחרת את משפט "המצב שלי הוא..." ומתאימה אליו את 3 Needle Tasks לשבוע הבא.</div>
+        </div>
+      </div>
+
+      <!-- יחסי המרה -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-hdr">📐 יחסי המרה — טווחי עבודה (לא מבחן)</div>
+        <div style="padding:14px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:12px;font-weight:800;color:var(--txt2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Visitors → Leads</div>
+            <div style="font-size:12.5px;line-height:2">
+              <span style="color:var(--red);font-weight:700">פחות מ-5%</span> — חלש מאוד. העמוד/תנועה לא מדברים על מה שהלקוחה מחפשת.<br>
+              <span style="color:var(--org);font-weight:700">5–10%</span> — סביר, דורש שיפור.<br>
+              <span style="color:var(--grn);font-weight:700">10–20%</span> — טוב מאוד לשירות כמו שלך.
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:800;color:var(--txt2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Leads → Sales</div>
+            <div style="font-size:12.5px;line-height:2">
+              <span style="color:var(--red);font-weight:700">פחות מ-10%</span> — חלש. בעיית אמון / מחיר / מסלול רכישה.<br>
+              <span style="color:var(--org);font-weight:700">10–20%</span> — סביר בהתחלה.<br>
+              <span style="color:var(--grn);font-weight:700">20–30%+</span> — חזק, במיוחד אם המחיר לא "זול".
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- אם-אז -->
+      <div id="control-board" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:13px;margin-bottom:18px"></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<div id="modal" class="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-title">הוספת מטלה יומית</div>
+    <div class="mf"><div class="ml">שם המטלה</div><input class="mi" id="m-name" placeholder="תאר את המטלה..."></div>
+    <div class="mf"><div class="ml">קטגוריה</div>
+      <select class="mi" id="m-cat">
+        <option value="focus_a">🔵 מחט / Focus A</option><option value="coaching">🟣 ליווי</option>
+        <option value="content">🟠 תוכן</option><option value="community">🩷 קהילה</option><option value="infra">🟢 תשתית</option>
+        <option value="reflection">🟡 ריפלקציה</option><option value="admin">⚪ אדמין</option>
+      </select>
+    </div>
+    <div class="mf"><div class="ml">יום</div>
+      <select class="mi" id="m-day">
+        <option value="0">ראשון</option><option value="1">שני</option><option value="2">שלישי</option>
+        <option value="3">רביעי</option><option value="4">חמישי</option><option value="5">שישי</option>
+      </select>
+    </div>
+    <div class="mf"><div class="ml">בלוק זמן</div>
+      <select class="mi" id="m-block">
+        <option value="morning_focus">Morning Focus 🌅</option>
+        <option value="evening_focus">Evening Focus 🌙</option>
+        <option value="soft_morning">Soft Morning</option>
+        <option value="soft_afternoon">Soft Afternoon</option>
+      </select>
+    </div>
+    <div class="mf"><div class="ml">שעה (אופציונלי)</div>
+      <input class="mi" id="m-time" placeholder="09:00" style="width:100px"></div>
+    <div class="mf"><div class="ml">משך</div>
+      <select class="mi" id="m-dur">
+        <option value="0.5">30 דק'</option><option value="1" selected>שעה</option>
+        <option value="1.5">שעה וחצי</option><option value="2">שעתיים</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-acc" onclick="confirmAdd()">הוסף</button>
+      <button class="btn btn-out" onclick="closeModal()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="file-input" accept=".json" style="display:none" onchange="handleImport(event)">
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════
+const DAYS = ['ראשון','שני','שלישי','רביעי','חמישי','שישי'];
+const MOS  = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const MOS_S= ['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'];
+
+const ST     = ['לביצוע','בתהליך','הושלם','בלוקד'];
+const ST_CLS = ['b-todo','b-prog','b-done','b-blok'];
+const OT     = ['לא ידוע','בדרך הנכונה','בסיכון','חורג'];
+const OT_CLS = ['b-unk','b-on','b-risk','b-off'];
+
+const ROADMAP_STEPS = [
+  {num:'שלב 1',title:'Meta Ads API',icon:'📢',
+   desc:'שליפה אוטומטית של לידים + הוצאות פרסום מהקמפיינים.',
+   action:'צרי Meta App ב-developers.facebook.com · שמרי App ID + Long-lived Access Token + Ad Account ID',
+   impact:'לידים + adSpend מתעדכנים אוטומטית מדי שבוע'},
+  {num:'שלב 2',title:'Supabase',icon:'🗄️',
+   desc:'שמירת כל הנתונים בענן — גישה מכל מכשיר.',
+   action:'פרויקט חינמי ב-supabase.com · שמרי Project URL + Anon Key',
+   impact:'גיבוי אוטומטי, גישה ממובייל, היסטוריה מלאה'},
+  {num:'שלב 3',title:'NeedleMover Agent',icon:'🧠',
+   desc:'כל ראשון 08:00: ניתוח אוטומטי + המלצת 3 משימות.',
+   action:'Anthropic API Key + Supabase מחובר (שלב 2 קודם)',
+   impact:'ראשון 08:00 — תוכנית לשבוע מוכנה'},
+  {num:'שלב 4',title:'Gmail Agent',icon:'📧',
+   desc:'סיווג ותגובה אוטומטית למיילים נכנסים.',
+   action:'OAuth Gmail (Google Cloud Console) + Make/Zapier Webhook',
+   impact:'חיסכון 30+ דק\'/יום, תיבה מסודרת'}
+];
+
+const PRINCIPLES = [
+  {key:'📖',title:'הגדרות יסוד',body:`
+    <strong>Visitor</strong> — אישה שנכנסה בפועל לעמוד המכירה. נמדד דרך אנליטיקס/פיקסל.<br><br>
+    <strong>Lead</strong> — אישה שעשתה לפחות אחת מ: השאירה פרטים בטופס, לחצה על כפתור רכישה/Checkout, שלחה הודעה מפורשת ("מתעניינת בליווי/בסדנה").<br><br>
+    <strong>Sale</strong> — השלימה תשלום בפועל: מהעמוד ישירות, או אחרי שיחת מכירה.<br><br>
+    <strong>פירוק:</strong> Sales_Direct_Page · Sales_From_Calls · Coaching_Sales_Total`},
+  {key:'🎯',title:'יעד קשיח שבועי — ליווים',body:`
+    <strong>3–4 ליוויים חדשים בשבוע</strong><br><br>
+    מקור ראשי: רכישה ישירה מהעמוד<br>
+    מקור משני: שיחות מכירה עם Leads חמים<br><br>
+    KPI: <strong>Coaching_Sales_Total / 4 (יעד)</strong>`},
+  {key:'📊',title:'פאנל בסיסי — יעדי תנועה',body:`
+    יעד שבועי (התחלתי — מתכוונן לפי נתונים אמיתיים):<br><br>
+    <strong>Visitors → 100</strong> כניסות לעמוד<br>
+    <strong>Leads → 15–20</strong> (יחס 15–20% מ-Visitors)<br>
+    <strong>Sales → 3–4</strong> (יחס ~3–4% מ-Visitors)<br><br>
+    Visitors→Leads: עד כמה העמוד משכנע לפעולה ראשונית<br>
+    Leads→Sales: עד כמה העמוד + שיחות טובים בסגירה`},
+  {key:'🔧',title:'סדר עדיפויות — מחט ומשני',body:`
+    <strong>מחט (לפי סדר):</strong><br>
+    1. המרה מהעמוד — מבקרת מבינה תוך שניות: מה יוצא לה, מה התוצאה, למה עכשיו, למה דווקא את<br>
+    2. תנועה איכותית — יישור בין מסר מודעה/פוסט לבין מה שבעמוד<br>
+    3. שיחות עם Leads חמים — לסגירה + ללמוד מה חסר בעמוד<br><br>
+    <strong>לא מחט (משני):</strong><br>
+    פוסטים ללא חיבור ישיר למוצר · ליטושים אסתטיים קטנים`},
+  {key:'📈',title:'KPI שבועי — מה נמדד',body:`
+    Page_Visitors_Week · Leads_Week · Sales_Direct_Page · Sales_From_Calls · Coaching_Sales_Total<br>
+    Ad_Spend_Week · Calls_Week (אמצעי, לא יעד בפני עצמו)<br><br>
+    <strong>כלל פרשנות:</strong><br>
+    יש Visitors + Leads אבל לא מכירות → מחט: קופי/הצעה בעמוד<br>
+    אין Visitors → מחט: קמפיין / מקורות תנועה<br>
+    יש Leads אבל לא סגירות → מחט: שיחות + התנגדויות`},
+  {key:'80/20',title:'עיקרון פארטו — Needle Tasks',body:`
+    20% מהמשימות = 80% מהתוצאות<br><br>
+    Needle Tasks נבחרות סביב:<br>
+    שיפור עמוד המכירה · הבאת Visitors איכותיים · שיחות עם Leads קרובים לסגירה<br><br>
+    מקסימום 3 Needle Movers בשבוע. כל שאר: לדחות, לאצול, להוריד.`},
+  {key:'⏰',title:'בלוקי עבודה',body:`
+    <strong>Morning Focus 10–13:</strong> מחט בלבד, ללא הפרעות<br>
+    <strong>Evening Focus 17–20:</strong> שיחות + מחט<br>
+    <strong>Soft Morning/Afternoon:</strong> תשתית · אדמין · תוכן`},
+  {key:'🔄',title:'ספרינטים שבועיים',body:`
+    שבוע = ספרינט<br>
+    ראשון: תכנון + הגדרת Needle Tasks<br>
+    שישי: ריפלקציה + עדכון KPI<br><br>
+    מסלול: מאי ~10K → יוני ~15K → יולי 20K`},
+  {key:'CAP',title:'מגבלות קיבולת',body:`
+    מקס 3–4 ליווים חדשים/שבוע · 6ש' ליווי<br>
+    1.5ש' תוכן · 1.5ש' תשתית · 0.5ש' ריפלקציה<br><br>
+    חריגה מהקיבולת = שחיקה. לא מחיר שאפשר לשלם.`}
+];
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+let weekOffset = 0;
+let appData    = null;
+
+// ── week key (Sunday) ──
+function weekKey(off = weekOffset) {
+  const d = new Date();
+  d.setDate(d.getDate() + off * 7);
+  d.setDate(d.getDate() - d.getDay());
+  return d.toISOString().slice(0,10);
+}
+function weekLabel(off = weekOffset) {
+  const d = new Date();
+  d.setDate(d.getDate() + off * 7);
+  const sun = new Date(d); sun.setDate(d.getDate() - d.getDay());
+  const fri = new Date(sun); fri.setDate(sun.getDate() + 5);
+  return `${sun.getDate()} ${MOS_S[sun.getMonth()]}–${fri.getDate()} ${MOS_S[fri.getMonth()]} ${fri.getFullYear()}`;
+}
+function prevWeek() { weekOffset--; refreshWeek(); }
+function nextWeek() { weekOffset++; refreshWeek(); }
+function refreshWeek() {
+  const lbl = weekLabel();
+  ['wk-lbl','qu-wk','kpi-wk','flow-wk'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = lbl;
+  });
+  renderCurrentTab();
+}
+
+function getWeek(key) {
+  const wk = appData?.weeks?.[key];
+  if (wk) return wk;
+  return mkDefaultWeek(key);
+}
+function mkDefaultWeek() {
+  return {
+    sprintTitle: '',
+    targets: {visitors:100,leads:20,calls:10,sales:3,pageDirectSales:2,salesFromCalls:1,adSpend:500,hoursCoaching:6,instaPosts:2,needleTasks:3,communityNew:0,communityActiveEvents:0},
+    metrics: {visitorsActual:0,leadsActual:0,callsActual:0,salesActual:0,pageDirectSalesActual:0,salesFromCallsActual:0,revenueActual:0,adSpendActual:0,instaPostsActual:0,communityNewActual:0,communityActiveEventsActual:0,communityFocusWeek:''},
+    hours:   {coaching:0,content:0,infra:0,needleMover:0,reflection:0},
+    tasks:   [{text:'',status:'todo'},{text:'',status:'todo'},{text:'',status:'todo'}],
+    infraTask: {text:'',status:'todo'}, gmailTask: {text:'',status:'todo'},
+    communityTask: {text:'',status:'todo'},
+    reflection:{done:false,summary:'',bottleneck:'',notes:'',onTrackTo20K:'unknown'},
+    flowTasks: []
+  };
+}
+function setWeek(key, wk) {
+  if (!appData) return;
+  if (!appData.weeks) appData.weeks = {};
+  appData.weeks[key] = wk;
+}
+
+// ══════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════
+async function reloadFromServer() {
+  // מנסה לטעון נתונים עדכניים — אם נכשל, שומר על מה שיש ולא מוחק כלום
+  const attempts = ['/api/data', 'data.json', '/data.json'];
+  for (const url of attempts) {
+    try {
+      const r = await fetch(url, {cache: 'no-store'});
+      if (!r.ok) continue;
+      const data = await r.json();
+      if (!data || typeof data !== 'object') continue;
+      appData = data;
+      localStorage.setItem('imvest_data_v2', JSON.stringify(appData));
+      renderAll();
+      toast('עודכן מ-data.json ✅');
+      return;
+    } catch {}
+  }
+  toast('השרת לא זמין — הנתונים הנוכחיים שלך נשמרים כרגיל.');
+}
+async function loadData() {
+  // עדיפות: localStorage > data.json (להשלמת שבועות חסרים) > embedded
+  // data.json לעולם לא דורס נתונים שנשמרו ידנית ב-localStorage
+
+  // 1. localStorage — הנתונים שנשמרו על-ידי המשתמשת
+  let lsData = null;
+  try {
+    const ls = localStorage.getItem('imvest_data_v2');
+    if (ls) lsData = JSON.parse(ls);
+  } catch {}
+
+  // 2. data.json / שרת — להשלמת שבועות / יעדים שאינם ב-localStorage
+  let fileData = null;
+  const attempts = ['/api/data', 'data.json', '/data.json'];
+  for (const url of attempts) {
+    try {
+      const r = await fetch(url, {cache: 'no-store'});
+      if (!r.ok) continue;
+      const data = await r.json();
+      if (data && typeof data === 'object') { fileData = data; break; }
+    } catch {}
+  }
+
+  // 3. נתונים מוטמעים ב-HTML — גיבוי אחרון
+  let embedded = null;
+  try {
+    const el = document.getElementById('embedded-data');
+    if (el) embedded = JSON.parse(el.textContent);
+  } catch {}
+
+  // 4. מיזוג: base = data.json או embedded, lsData תמיד מנצח לשבועות שנשמרו
+  const base = fileData || embedded || {goals: defGoals(), weeks: {}};
+
+  if (lsData) {
+    // localStorage קיים — הוא הבסיס. data.json ממלא רק שבועות חסרים
+    appData = { ...base, ...lsData };
+    appData.weeks = { ...base.weeks, ...(lsData.weeks || {}) };
+    if (!appData.goals) appData.goals = base.goals || defGoals();
+    const ts = lsData.lastUpdated ? ' · עודכן ' + lsData.lastUpdated : '';
+    setDataStatus('ok', 'נתונים שמורים נטענו בהצלחה' + ts);
+  } else {
+    // אין localStorage — השתמש ב-data.json / embedded
+    appData = base;
+    setDataStatus('warn', fileData ? 'נטען מ-data.json · שינויים יישמרו אוטומטית' : 'נטען מנתונים מוטמעים');
+  }
+
+  renderAll();
+}
+async function saveData() {
+  if (!appData) return;
+  appData.lastUpdated = new Date().toISOString().slice(0,10);
+  const json = JSON.stringify(appData, null, 2);
+  // תמיד שמור ב-localStorage קודם — זה מה שנטען בפתיחה הבאה
+  localStorage.setItem('imvest_data_v2', json);
+  const ts = new Date().toLocaleTimeString('he-IL');
+  document.getElementById('data-saved-at').textContent = 'נשמר ' + ts;
+  document.getElementById('sb-save-time').textContent = 'נשמר ' + ts;
+  // נסה גם שרת (אופציונלי)
+  try {
+    const r = await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:json});
+    if (r.ok) { setDataStatus('ok','נשמר · ' + ts); toast('נשמר ✅'); return; }
+  } catch {}
+  setDataStatus('ok','נשמר · ' + ts);
+  toast('נשמר ✅');
+}
+function setDataStatus(type, txt) {
+  const dot = document.getElementById('data-dot');
+  const el  = document.getElementById('data-status-txt');
+  if (!dot||!el) return;
+  dot.className = 'data-dot'+(type==='warn'?' warn':type==='err'?' err':'');
+  el.textContent = txt;
+}
+function saveAll() { saveData(); }
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+const TITLES = {update:'עדכון מהיר',kpi:'KPI שבועי',sprint:'ספרינט שבועי',
+                flow:'זרימה יומית',goals:'יעדים חודשיים',roadmap:'מפת דרכים',principles:'עקרונות'};
+
+function go(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('pg-title').textContent = TITLES[name]||name;
+  renderTab(name);
+}
+function renderCurrentTab() {
+  const a = document.querySelector('.tab-panel.active');
+  if (a) renderTab(a.id.replace('tab-',''));
+}
+function renderTab(name) {
+  if (name==='update')     renderUpdate();
+  if (name==='kpi')        renderKPI();
+  if (name==='sprint')     renderSprint();
+  if (name==='flow')       renderFlow();
+  if (name==='goals')      renderGoals();
+  if (name==='roadmap')    renderRoadmap();
+  if (name==='principles') renderPrinciples();
+}
+function renderAll() {
+  refreshWeek();
+}
+
+// ══════════════════════════════════════════════════════
+// QUICK UPDATE
+// ══════════════════════════════════════════════════════
+function renderUpdate() {
+  const key = weekKey();
+  const wk  = getWeek(key);
+  const m   = wk.metrics;
+  const tgt = wk.targets || {};
+  const needleDone = wk.tasks?.filter(t => stIdx(t.status)===2).length || 0;
+
+  const fields = [
+    {key:'visitorsActual',        lbl:'כניסות לעמוד 👁️',     tgt:tgt.visitors||100,     col:'var(--txt2)'},
+    {key:'leadsActual',           lbl:'לידים 🎯',             tgt:tgt.leads||20,         col:'var(--acc)'},
+    {key:'pageDirectSalesActual', lbl:'מכירות מהעמוד 🛒',    tgt:tgt.pageDirectSales||2,col:'var(--grn)'},
+    {key:'salesFromCallsActual',  lbl:'מכירות משיחות 📞💼',  tgt:tgt.salesFromCalls||1, col:'var(--grn)'},
+    {key:'callsActual',           lbl:'שיחות מכירה 📞',       tgt:tgt.calls||10,         col:'var(--pur)'},
+    {key:'adSpendActual',         lbl:'תקציב פרסום ₪ 📢',    tgt:tgt.adSpend||500,      col:'var(--org)'},
+    {key:'instaPostsActual',      lbl:'פוסטים אינסטה 📸',    tgt:tgt.instaPosts||2,     col:'var(--gld)'},
+    {key:'communityNewActual',    lbl:'חברות חדשות קהילה 👥', tgt:tgt.communityNew||0,   col:'#e75480'},
+    {key:'communityActiveEventsActual', lbl:'אירועי ליבה קהילה 🎪', tgt:tgt.communityActiveEvents||0, col:'#e75480'}
+  ];
+
+  document.getElementById('qu-grid').innerHTML = fields.map(f => {
+    const val = m[f.key]||0;
+    const pct = Math.min(100, Math.round(val/(f.tgt||1)*100));
+    const col = pct>=100?'var(--grn)':pct>=60?'var(--org)':'var(--red)';
+    return `<div class="qu-field">
+      <div class="qu-lbl">${f.lbl}</div>
+      <input class="qu-inp" type="number" value="${val}" min="0"
+        onchange="setM('${key}','${f.key}',+this.value)"
+        oninput="setM('${key}','${f.key}',+this.value);liveBar(this,${f.tgt})">
+      <div class="qu-unit">יעד: ${f.key.includes('Spend')||f.key.includes('revenue')?'₪':''}${f.tgt} — ${pct}%</div>
+      <div class="qu-bar"><div class="qu-bar-fill" style="width:${pct}%;background:${col}" data-tgt="${f.tgt}"></div></div>
+    </div>`;
+  }).join('');
+
+  const h = wk.hours;
+  const hFields = [
+    {key:'coaching',   lbl:'ליווי (מקס 6)',  max:tgt.hoursCoaching||6, col:'var(--pur)'},
+    {key:'content',    lbl:'תוכן (1.5)',       max:1.5,  col:'var(--org)'},
+    {key:'infra',      lbl:'תשתית (1.5)',      max:1.5,  col:'var(--grn)'},
+    {key:'needleMover',lbl:'Needle (1)',        max:1,    col:'var(--acc)'},
+    {key:'reflection', lbl:'ריפלקציה (0.5)',   max:0.5,  col:'var(--gld)'}
+  ];
+  document.getElementById('qu-hours').innerHTML = hFields.map(f => {
+    const val = h[f.key]||0;
+    const pct = Math.min(100, Math.round(val/f.max*100));
+    const col = val>f.max?'var(--red)':f.col;
+    return `<div class="hrs-field">
+      <div class="hrs-lbl">${f.lbl}</div>
+      <input class="hrs-inp" type="number" step="0.5" value="${val}" min="0"
+        onchange="setH('${key}','${f.key}',+this.value)"
+        oninput="setH('${key}','${f.key}',+this.value)">
+      <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('qu-tasks').innerHTML = wk.tasks.map((t,i) => `
+    <div class="task-row">
+      <div class="task-num" style="background:${['var(--acc)','var(--pur)','var(--grn)'][i]}">${i+1}</div>
+      <div class="task-body">
+        <input class="task-inp" value="${t.text}" placeholder="Needle Mover ${i+1}..."
+          onchange="setT('${key}',${i},'text',this.value)">
+        ${t.detail?`<div class="task-detail">${t.detail}</div>`:''}
+      </div>
+      <span class="badge ${ST_CLS[stIdx(t.status)]}" onclick="cycleT('${key}',${i},this)">${ST[stIdx(t.status)]}</span>
+    </div>
+  `).join('');
+}
+
+function liveBar(inp, tgt) {
+  const f = inp.closest('.qu-field');
+  const fill = f?.querySelector('.qu-bar-fill');
+  if (!fill) return;
+  const pct = Math.min(100, Math.round(+inp.value/(tgt||1)*100));
+  const col = pct>=100?'var(--grn)':pct>=60?'var(--org)':'var(--red)';
+  fill.style.width=pct+'%'; fill.style.background=col;
+}
+function setM(k,f,v){const wk=getWeek(k);wk.metrics[f]=v;setWeek(k,wk)}
+function setH(k,f,v){const wk=getWeek(k);wk.hours[f]=v;setWeek(k,wk)}
+function setT(k,i,f,v){const wk=getWeek(k);wk.tasks[i][f]=v;setWeek(k,wk)}
+function cycleT(k,i,el){
+  const wk=getWeek(k);
+  const idx=(stIdx(wk.tasks[i].status)+1)%ST.length;
+  wk.tasks[i].status=stKey(idx); setWeek(k,wk);
+  el.textContent=ST[idx]; el.className='badge '+ST_CLS[idx];
+}
+
+// ══════════════════════════════════════════════════════
+// KPI
+// ══════════════════════════════════════════════════════
+function renderKPI() {
+  const key = weekKey();
+  const wk  = getWeek(key);
+  const m   = wk.metrics;
+  const tgt = wk.targets || {};
+  const needleDone = wk.tasks?.filter(t=>stIdx(t.status)===2).length||0;
+  const needleTgt  = tgt.needleTasks||3;
+
+  const coachingTotal = (m.pageDirectSalesActual||0) + (m.salesFromCallsActual||0);
+  const cards = [
+    {lbl:'כניסות לעמוד 👁️',       val:m.visitorsActual||0,       tgt:tgt.visitors||100,       col:null,  note:'Visitors'},
+    {lbl:'לידים השבוע 🎯',         val:m.leadsActual||0,           tgt:tgt.leads||20,           col:null,  note:'Visitors→Leads'},
+    {lbl:'ליווים סה"כ 💼',         val:coachingTotal,              tgt:tgt.sales||3,            col:null,  suf:`/${tgt.sales||3}`,note:'יעד קשיח'},
+    {lbl:'מכירות מהעמוד 🛒',       val:m.pageDirectSalesActual||0, tgt:tgt.pageDirectSales||2,  col:null,  note:'Direct'},
+    {lbl:'מכירות משיחות 📞',       val:m.salesFromCallsActual||0,  tgt:tgt.salesFromCalls||1,   col:null,  note:'Calls'},
+    {lbl:'שיחות מכירה 📞',          val:m.callsActual||0,           tgt:tgt.calls||10,           col:null,  note:'אמצעי'},
+    {lbl:'תקציב פרסום ₪ 📢',       val:m.adSpendActual||0,         tgt:tgt.adSpend||500,        col:null,  pre:'₪'},
+    {lbl:'משימות מחט ✅',           val:needleDone,                 tgt:needleTgt,               col:null,  suf:`/${needleTgt}`}
+  ];
+
+  document.getElementById('kpi-grid').innerHTML = cards.map(c => {
+    const pct = c.tgt>0?Math.min(100,Math.round(c.val/c.tgt*100)):0;
+    const col = c.col||(pct>=100?'var(--grn)':pct>=60?'var(--org)':'var(--red)');
+    return `<div class="kpi">
+      <div class="kpi-lbl">${c.lbl}${c.note?` <span style="font-size:9px;color:var(--txt2);font-weight:400">${c.note}</span>`:''}</div>
+      <div class="kpi-val" style="color:${col}">${c.pre||''}${c.val}${c.suf||''}</div>
+      <div class="kpi-tgt">יעד: ${c.pre||''}${c.tgt} — ${pct}%</div>
+      <div class="kpi-bar"><div class="kpi-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Community KPI cards
+  const comCards = [
+    {lbl:'חברות חדשות 👥', val:m.communityNewActual||0, tgt:tgt.communityNew||0, note:'New Members'},
+    {lbl:'אירועי ליבה 🎪',  val:m.communityActiveEventsActual||0, tgt:tgt.communityActiveEvents||0, note:'Lives, Q&A, עומק'}
+  ];
+  document.getElementById('kpi-community').innerHTML = comCards.map(c=>{
+    const pct = c.tgt>0?Math.min(100,Math.round(c.val/c.tgt*100)):0;
+    const col = c.tgt===0?'#e75480':pct>=100?'var(--grn)':pct>=60?'var(--org)':'var(--red)';
+    return `<div class="kpi">
+      <div class="kpi-lbl">${c.lbl} <span style="font-size:9px;color:var(--txt2);font-weight:400">${c.note}</span></div>
+      <div class="kpi-val" style="color:${col}">${c.val}${c.tgt>0?`/${c.tgt}`:''}</div>
+      ${c.tgt>0?`<div class="kpi-bar"><div class="kpi-fill" style="width:${pct}%;background:${col}"></div></div>`:''}
+    </div>`;
+  }).join('');
+  const focusInp = document.getElementById('community-focus-inp');
+  if (focusInp) {
+    focusInp.value = m.communityFocusWeek||'';
+    focusInp.oninput = e => { const w=getWeek(key); w.metrics.communityFocusWeek=e.target.value; setWeek(key,w); };
+  }
+
+  // Revenue chart
+  const mayStart = new Date(2026,4,3);
+  const revs = [0,1,2,3].map(w=>{
+    const d=new Date(mayStart); d.setDate(d.getDate()+w*7);
+    const k=d.toISOString().slice(0,10);
+    return {lbl:`שבוע ${w+1}`, val:(getWeek(k).metrics?.revenueActual||0)};
+  });
+  const maxTgt = 10000/4;
+  document.getElementById('rev-chart').innerHTML = revs.map(r=>{
+    const h=maxTgt>0?Math.max(4,Math.min(100,Math.round(r.val/maxTgt*100))):4;
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:11px;color:var(--txt2)">₪${r.val.toLocaleString()}</div>
+      <div style="flex:1;width:100%;display:flex;align-items:flex-end">
+        <div style="width:100%;height:${h}%;background:var(--acc);border-radius:3px 3px 0 0;min-height:4px"></div>
+      </div>
+      <div style="font-size:11px;font-weight:700">${r.lbl}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('rev-lbl').textContent = `יעד שבועי: ₪${Math.round(maxTgt).toLocaleString()} | יעד מאי: ₪10,000`;
+
+  document.getElementById('goals-summary').innerHTML =
+    (appData?.goals||defGoals()).map(g=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--brd)">
+        <span style="font-weight:700;min-width:88px">${g.month}</span>
+        <span>יעד: ₪${g.revenueTarget.toLocaleString()}</span>
+        <span style="font-size:12px;color:var(--txt2)">${g.priorities?.split('|')[0]?.trim()||''}</span>
+        <span class="badge ${OT_CLS[otIdx(g.onTrack)]}" style="margin-right:auto">${OT[otIdx(g.onTrack)]}</span>
+      </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// SPRINT
+// ══════════════════════════════════════════════════════
+function renderSprint() {
+  const key = weekKey();
+  const wk  = getWeek(key);
+  const m   = wk.metrics;
+  const h   = wk.hours;
+  const tgt = wk.targets||{};
+
+  // title
+  const ti = document.getElementById('sp-title-inp');
+  ti.value = wk.sprintTitle||'';
+  ti.oninput = e => { const w=getWeek(key); w.sprintTitle=e.target.value; setWeek(key,w); };
+
+  // metrics
+  const mf = [
+    {lbl:'לידים יעד',         val:tgt.leads||20,          ro:true},
+    {lbl:'לידים בפועל ✅',    val:m.leadsActual,           key:'leadsActual'},
+    {lbl:'שיחות יעד',          val:tgt.calls||10,           ro:true},
+    {lbl:'שיחות בפועל ✅',    val:m.callsActual,           key:'callsActual'},
+    {lbl:'ליווים יעד',         val:tgt.sales||3,            ro:true},
+    {lbl:'ליווים בפועל ✅',   val:m.salesActual,           key:'salesActual'},
+    {lbl:'רכישות עמוד יעד',   val:tgt.pageDirectSales||2,  ro:true},
+    {lbl:'רכישות עמוד ✅',    val:m.pageDirectSalesActual, key:'pageDirectSalesActual'},
+    {lbl:'פרסום ₪ יעד',       val:tgt.adSpend||500,        ro:true},
+    {lbl:'פרסום ₪ בפועל ✅',  val:m.adSpendActual,         key:'adSpendActual'},
+    {lbl:'👥 חברות חדשות יעד', val:tgt.communityNew||0,    ro:true},
+    {lbl:'👥 חברות חדשות ✅',  val:m.communityNewActual,   key:'communityNewActual'},
+    {lbl:'🎪 אירועי ליבה יעד', val:tgt.communityActiveEvents||0, ro:true},
+    {lbl:'🎪 אירועי ליבה ✅',  val:m.communityActiveEventsActual, key:'communityActiveEventsActual'},
+  ];
+  document.getElementById('sp-metrics').innerHTML = mf.map(f=>
+    f.ro
+      ? `<div class="hrs-field"><div class="hrs-lbl">${f.lbl}</div><div class="hrs-inp" style="font-size:20px;font-weight:900;color:var(--txt2)">${f.val}</div></div>`
+      : `<div class="hrs-field"><div class="hrs-lbl">${f.lbl}</div>
+         <input class="hrs-inp" type="number" value="${f.val||0}"
+           onchange="setM('${key}','${f.key}',+this.value)"
+           oninput="setM('${key}','${f.key}',+this.value)">
+         </div>`
+  ).join('');
+
+  // hours
+  const hf=[
+    {lbl:'ליווי (מקס 6)',  key:'coaching',   max:tgt.hoursCoaching||6, col:'var(--pur)'},
+    {lbl:'תוכן (1.5)',     key:'content',    max:1.5,col:'var(--org)'},
+    {lbl:'תשתית (1.5)',    key:'infra',      max:1.5,col:'var(--grn)'},
+    {lbl:'Needle (1)',     key:'needleMover',max:1,  col:'var(--acc)'},
+    {lbl:'ריפלקציה (0.5)',key:'reflection', max:0.5,col:'var(--gld)'}
+  ];
+  document.getElementById('sp-hours').innerHTML = hf.map(f=>{
+    const val=h[f.key]||0, pct=Math.min(100,Math.round(val/f.max*100));
+    const col=val>f.max?'var(--red)':f.col;
+    return `<div class="hrs-field"><div class="hrs-lbl">${f.lbl}</div>
+      <input class="hrs-inp" type="number" step="0.5" value="${val}"
+        onchange="setH('${key}','${f.key}',+this.value)"
+        oninput="setH('${key}','${f.key}',+this.value)">
+      <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+
+  // tasks
+  document.getElementById('sp-tasks').innerHTML = wk.tasks.map((t,i)=>`
+    <div class="task-row">
+      <div class="task-num" style="background:${['var(--acc)','var(--pur)','var(--grn)'][i]}">${i+1}</div>
+      <div class="task-body">
+        <input class="task-inp" value="${t.text}" placeholder="Needle Mover ${i+1}..."
+          onchange="setT('${key}',${i},'text',this.value)">
+        ${t.detail?`<div class="task-detail">${t.detail}</div>`:''}
+      </div>
+      <span class="badge ${ST_CLS[stIdx(t.status)]}" onclick="cycleT('${key}',${i},this)">${ST[stIdx(t.status)]}</span>
+    </div>`).join('');
+
+  // community needle task
+  const ct = wk.communityTask || {text:'',status:'todo'};
+  document.getElementById('sp-community').innerHTML = `
+    <div class="task-row">
+      <div class="task-num" style="background:#e75480">👥</div>
+      <div class="task-body">
+        <input class="task-inp" value="${ct.text}" placeholder="מחט קהילה (למשל: לבנות דף תיאור, להגדיר מבנה, לתאם מפגש ראשון)..."
+          onchange="setAgent('${key}','communityTask','text',this.value)"
+          oninput="setAgent('${key}','communityTask','text',this.value)">
+        ${ct.detail?`<div class="task-detail">${ct.detail}</div>`:''}
+      </div>
+      <span class="badge ${ST_CLS[stIdx(ct.status)]}"
+        onclick="cycleAgent('${key}','communityTask',this)">${ST[stIdx(ct.status)]}</span>
+    </div>`;
+
+  // agents
+  const af=[{lbl:'🔧 תשתית',k:'infraTask'},{lbl:'📧 Gmail',k:'gmailTask'}];
+  document.getElementById('sp-agents').innerHTML = af.map(a=>`
+    <div class="task-row">
+      <span class="task-lbl">${a.lbl}</span>
+      <div class="task-body">
+        <input class="task-inp" value="${wk[a.k]?.text||''}"
+          onchange="setAgent('${key}','${a.k}','text',this.value)">
+        ${wk[a.k]?.detail?`<div class="task-detail">${wk[a.k].detail}</div>`:''}
+      </div>
+      <span class="badge ${ST_CLS[stIdx(wk[a.k]?.status)]}"
+        onclick="cycleAgent('${key}','${a.k}',this)">${ST[stIdx(wk[a.k]?.status)]}</span>
+    </div>`).join('');
+
+  // reflection
+  const ref = wk.reflection||{};
+  const rb = document.getElementById('ref-badge');
+  rb.textContent = ref.done?'בוצע':'לא בוצע';
+  rb.className   = 'badge '+(ref.done?'b-done':'b-unk');
+  document.getElementById('ref-txt').value  = ref.summary||'';
+  document.getElementById('ref-bnk').value  = ref.bottleneck||'';
+  document.getElementById('sp-notes').value = ref.notes||'';
+  const ob = document.getElementById('ot-badge');
+  ob.textContent = OT[otIdx(ref.onTrackTo20K)];
+  ob.className   = 'badge '+OT_CLS[otIdx(ref.onTrackTo20K)];
+
+  document.getElementById('ref-txt').oninput  = e => { const w=getWeek(key);w.reflection.summary=e.target.value;setWeek(key,w); };
+  document.getElementById('ref-bnk').oninput  = e => { const w=getWeek(key);w.reflection.bottleneck=e.target.value;setWeek(key,w); };
+  document.getElementById('sp-notes').oninput = e => { const w=getWeek(key);w.reflection.notes=e.target.value;setWeek(key,w); };
+}
+function setAgent(k,field,subf,val){const w=getWeek(k);if(!w[field])w[field]={text:'',status:'todo'};w[field][subf]=val;setWeek(k,w);}
+function cycleAgent(k,field,el){
+  const w=getWeek(k); if(!w[field])w[field]={text:'',status:'todo'};
+  const idx=(stIdx(w[field].status)+1)%ST.length;
+  w[field].status=stKey(idx); setWeek(k,w);
+  el.textContent=ST[idx]; el.className='badge '+ST_CLS[idx];
+}
+function cycleRef(){
+  const key=weekKey(); const w=getWeek(key); w.reflection.done=!w.reflection.done; setWeek(key,w);
+  const el=document.getElementById('ref-badge');
+  el.textContent=w.reflection.done?'בוצע':'לא בוצע';
+  el.className='badge '+(w.reflection.done?'b-done':'b-unk');
+}
+function cycleOT(){
+  const key=weekKey(); const w=getWeek(key);
+  const idx=(otIdx(w.reflection.onTrackTo20K)+1)%OT.length;
+  w.reflection.onTrackTo20K=otKey(idx); setWeek(key,w);
+  const el=document.getElementById('ot-badge');
+  el.textContent=OT[idx]; el.className='badge '+OT_CLS[idx];
+}
+
+// ══════════════════════════════════════════════════════
+// FLOW
+// ══════════════════════════════════════════════════════
+function renderFlow() {
+  const key = weekKey();
+  const wk  = getWeek(key);
+  const tasks = wk.flowTasks || [];
+
+  // DEBUG: הצג אבחון אם אין משימות
+  const dbg = document.getElementById('flow-debug');
+  if (dbg) {
+    const keys = Object.keys(appData?.weeks||{});
+    dbg.innerHTML = tasks.length > 0
+      ? ''
+      : `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:12px;direction:rtl">
+          🔍 <strong>אבחון:</strong> לא נמצאו משימות<br>
+          מפתח מחופש: <code>${key}</code><br>
+          שבועות בנתונים: <code>${keys.join(', ')||'אין'}</code><br>
+          מקור נתונים: <code>${document.getElementById('data-status-txt')?.textContent||'?'}</code>
+        </div>`;
+  }
+
+  const CAT_HE = {focus_a:'מיקוד',coaching:'ליווי',content:'תוכן',community:'קהילה',infra:'תשתית',reflection:'ריפלקציה',admin:'אדמין'};
+
+  document.getElementById('flow-grid').innerHTML = DAYS.map((day,di)=>{
+    const dt = tasks.map((t,i)=>({t,i})).filter(({t})=>t.day===di);
+    const done = dt.filter(({t})=>stIdx(t.status)===2).length;
+    return `<div class="flow-day">
+      <div class="flow-hdr">
+        ${day}
+        <span class="flow-count">${done}/${dt.length}</span>
+      </div>
+      <div class="flow-body">
+        ${dt.map(({t,i:gi},pos)=>{
+          const isDone=stIdx(t.status)===2;
+          const isFirst=pos===0, isLast=pos===dt.length-1;
+          const safeName=t.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+          return `<div class="flow-task ft-${t.cat}${isDone?' ft-done':''}" id="ft-${gi}">
+            <div class="ft-view">
+              <div class="ft-name" onclick="cycleFlow('${key}',${gi})" style="cursor:pointer">${t.name}</div>
+              <div class="ft-meta" onclick="cycleFlow('${key}',${gi})" style="cursor:pointer">
+                <span class="badge ${ST_CLS[stIdx(t.status)]}" style="font-size:9px;padding:1px 6px">${ST[stIdx(t.status)]}</span>
+                ${t.time?`<span class="ft-time">${t.time}</span>`:''}
+                <span>${t.dur}ש'</span>
+              </div>
+              <div class="ft-actions">
+                ${!isFirst?`<button class="ft-btn" onclick="moveFlowOrder('${key}',${gi},-1,${di})" title="העלה">↑</button>`:`<span class="ft-btn-ph"></span>`}
+                ${!isLast?`<button class="ft-btn" onclick="moveFlowOrder('${key}',${gi},1,${di})" title="הורד">↓</button>`:`<span class="ft-btn-ph"></span>`}
+                <button class="ft-btn" onclick="toggleFlowEdit(${gi})" title="ערוך">✏️</button>
+                <button class="ft-btn" onclick="deleteFlowTask('${key}',${gi})" title="מחק" style="color:var(--red)">🗑</button>
+              </div>
+            </div>
+            <div class="ft-edit-form" id="fte-${gi}" style="display:none">
+              <input class="ft-ei" type="text" placeholder="שם המשימה" value="${safeName}" id="fte-name-${gi}">
+              <div class="ft-ei-row">
+                <input class="ft-ei ft-ei-sm" type="time" value="${t.time||''}" id="fte-time-${gi}" title="שעה">
+                <input class="ft-ei ft-ei-sm" type="number" value="${t.dur}" id="fte-dur-${gi}" min="0.25" step="0.25" title="שעות">
+              </div>
+              <div class="ft-ei-row">
+                <select class="ft-ei ft-ei-sm" id="fte-cat-${gi}">
+                  ${Object.entries(CAT_HE).map(([v,l])=>`<option value="${v}"${t.cat===v?' selected':''}>${l}</option>`).join('')}
+                </select>
+                <select class="ft-ei ft-ei-sm" id="fte-day-${gi}">
+                  ${DAYS.map((d,idx)=>`<option value="${idx}"${t.day===idx?' selected':''}>${d}</option>`).join('')}
+                </select>
+              </div>
+              <div class="ft-ei-row">
+                <button class="btn btn-grn btn-sm" onclick="saveFlowEdit('${key}',${gi})">שמור</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleFlowEdit(${gi})">ביטול</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+        <div class="add-row" onclick="openModal(${di})">+ הוסף</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cycleFlow(k, i) {
+  const wk = getWeek(k);
+  const idx = (stIdx(wk.flowTasks[i].status)+1) % ST.length;
+  wk.flowTasks[i].status = stKey(idx);
+  setWeek(k, wk);
+  renderFlow();
+}
+
+function toggleFlowEdit(gi) {
+  const form = document.getElementById('fte-'+gi);
+  if (!form) return;
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveFlowEdit(key, gi) {
+  const wk = getWeek(key);
+  const t = wk.flowTasks[gi];
+  const name = document.getElementById('fte-name-'+gi).value.trim();
+  if (!name) return;
+  t.name = name;
+  t.time = document.getElementById('fte-time-'+gi).value;
+  t.dur = +document.getElementById('fte-dur-'+gi).value || t.dur;
+  t.cat = document.getElementById('fte-cat-'+gi).value;
+  t.day = +document.getElementById('fte-day-'+gi).value;
+  setWeek(key, wk);
+  renderFlow();
+  toast('נשמר!');
+}
+
+function moveFlowOrder(key, gi, dir, day) {
+  const wk = getWeek(key);
+  const tasks = wk.flowTasks;
+  const dayItems = tasks.map((t,i)=>({t,i})).filter(({t})=>t.day===day);
+  const pos = dayItems.findIndex(({i})=>i===gi);
+  const targetPos = pos + dir;
+  if (targetPos < 0 || targetPos >= dayItems.length) return;
+  const targetGi = dayItems[targetPos].i;
+  [tasks[gi], tasks[targetGi]] = [tasks[targetGi], tasks[gi]];
+  setWeek(key, wk);
+  renderFlow();
+}
+
+function deleteFlowTask(key, gi) {
+  if (!confirm('למחוק את המשימה?')) return;
+  const wk = getWeek(key);
+  wk.flowTasks.splice(gi, 1);
+  setWeek(key, wk);
+  renderFlow();
+  toast('נמחק');
+}
+
+// ══════════════════════════════════════════════════════
+// GOALS
+// ══════════════════════════════════════════════════════
+function defGoals() {
+  return [
+    {month:'מאי 2026',id:'may26',cls:'m-may',revenueTarget:10000,coachingTarget:'2-3',workshopSeats:15,
+     communityNew:50,weeklyLeads:20,adSpendBudget:500,maxCoachingPerWeek:5,
+     priorities:'10 שיחות/שבוע | דף מכירה חד | סילבוס סדנה | Call Insights Agent',notes:'שבוע מעבר',onTrack:'unknown'},
+    {month:'יוני 2026',id:'jun26',cls:'m-jun',revenueTarget:15000,coachingTarget:'3-4',workshopSeats:20,
+     communityNew:80,weeklyLeads:60,adSpendBudget:1200,maxCoachingPerWeek:5,
+     priorities:'סקלינג ליווי | קהילה | Gmail Agent',notes:'מכירות + תוכן מדד',onTrack:'unknown'},
+    {month:'יולי 2026',id:'jul26',cls:'m-jul',revenueTarget:20000,coachingTarget:'5',workshopSeats:25,
+     communityNew:100,weeklyLeads:80,adSpendBudget:1500,maxCoachingPerWeek:5,
+     priorities:'מערכת מלאה | יעד 20K | MVP תודעה בנקאית',notes:'הוכחת מודל',onTrack:'unknown'}
+  ];
+}
+function renderGoals() {
+  const goals = appData?.goals || defGoals();
+  document.getElementById('goals-tbody').innerHTML = goals.map((g,i)=>`
+    <tr class="${g.cls||''}">
+      <td><strong>${g.month}</strong></td>
+      <td>₪<input class="ed-n" type="number" value="${g.revenueTarget}" onchange="setGoal(${i},'revenueTarget',+this.value)"></td>
+      <td><input class="ed-n" type="text" value="${g.coachingTarget}" style="width:55px" onchange="setGoal(${i},'coachingTarget',this.value)"></td>
+      <td><input class="ed-n" type="number" value="${g.workshopSeats}" onchange="setGoal(${i},'workshopSeats',+this.value)"></td>
+      <td><input class="ed-n" type="number" value="${g.communityNew}" onchange="setGoal(${i},'communityNew',+this.value)"></td>
+      <td><input class="ed-n" type="number" value="${g.weeklyLeads}" onchange="setGoal(${i},'weeklyLeads',+this.value)"></td>
+      <td>₪<input class="ed-n" type="number" value="${g.adSpendBudget}" style="width:70px" onchange="setGoal(${i},'adSpendBudget',+this.value)"></td>
+      <td><input class="ed-n" type="number" value="${g.maxCoachingPerWeek}" onchange="setGoal(${i},'maxCoachingPerWeek',+this.value)"></td>
+      <td><input class="ed-t" type="text" value="${g.priorities}" style="width:195px" onchange="setGoal(${i},'priorities',this.value)"></td>
+      <td><input class="ed-t" type="text" value="${g.notes}" style="width:130px" onchange="setGoal(${i},'notes',this.value)"></td>
+      <td><span class="badge ${OT_CLS[otIdx(g.onTrack)]}" onclick="cycleGoalOT(${i},this)">${OT[otIdx(g.onTrack)]}</span></td>
+    </tr>`).join('');
+}
+function setGoal(i,f,v){if(!appData.goals)appData.goals=defGoals();appData.goals[i][f]=v;}
+function cycleGoalOT(i,el){
+  if(!appData.goals)return;
+  const idx=(otIdx(appData.goals[i].onTrack)+1)%OT.length;
+  appData.goals[i].onTrack=otKey(idx);
+  el.textContent=OT[idx]; el.className='badge '+OT_CLS[idx];
+}
+function addGoal(){
+  if(!appData.goals)appData.goals=defGoals();
+  appData.goals.push({month:'חודש חדש',id:'new'+Date.now(),cls:'',revenueTarget:0,coachingTarget:'0',
+    workshopSeats:0,communityNew:0,weeklyLeads:0,adSpendBudget:0,maxCoachingPerWeek:5,
+    priorities:'',notes:'',onTrack:'unknown'});
+  renderGoals();
+}
+
+// ══════════════════════════════════════════════════════
+// ROADMAP & PRINCIPLES
+// ══════════════════════════════════════════════════════
+function renderRoadmap() {
+  document.getElementById('roadmap-panel').innerHTML = `
+    <div class="roadmap-hdr">🔧 4 שלבים לאוטומציה מלאה — המצב כרגע: הזנה ידנית ✍️</div>
+    <div class="roadmap-grid">
+      ${ROADMAP_STEPS.map(s=>`
+        <div class="roadmap-step">
+          <div class="step-num">${s.num}</div>
+          <div class="step-title">${s.icon} ${s.title}</div>
+          <div class="step-desc">${s.desc}</div>
+          <div class="step-action"><strong>📋 מה נדרש:</strong> ${s.action}</div>
+          <div class="step-impact">✨ ${s.impact}</div>
+        </div>`).join('')}
+    </div>`;
+}
+const CONTROL_BOARD = [
+  {
+    icon:'👁️📉', title:'הרבה Visitors, מעט Leads',
+    signal:'Visitors גבוה (100+) · Leads נמוך (0–5)',
+    meaning:'נשים נכנסות אבל העמוד לא גורם להן "להרים יד". הבעיה בהצגת ההצעה, לא בתנועה.',
+    causes:'כותרת מדברת עלייך ולא עליהן · לא ברור מה הן מקבלות · פחדים/התנגדויות לא מטופלים',
+    tasks:'לשכתב כותרת + פתיח + "למי זה" · להוסיף 2–3 bulletים לפני/אחרי קונקרטיים · לטפל בפחד מרכזי אחד',
+    badge:'בעיית עמוד', bcls:'var(--red)'
+  },
+  {
+    icon:'🎯📉', title:'Leads יפים, מעט Sales',
+    signal:'Leads: 15–20 · Sales_Direct + Calls: 0–1',
+    meaning:'עניין יש, אבל משהו עוצר אותן ברגע האמת — שלב הסגירה לא עובד.',
+    causes:'CTA / מחיר מרגיש לא מצדיק · תהליך תשלום מסורבל · בשיחות — פחדים לא מטופלים',
+    tasks:'לעבור על תהליך הרכישה כלקוחה ולמצוא איפה עוצרת · להוסיף "מה קורה אחרי הרשמה" · בשיחות: לשאול "מה הדבר היחיד שעוצר אותך?"',
+    badge:'בעיית סגירה', bcls:'var(--org)'
+  },
+  {
+    icon:'📭', title:'מעט Visitors, מעט Leads, מעט Sales',
+    signal:'כל המספרים נמוכים — כמעט אין תנועה לעמוד',
+    meaning:'אין מספיק נשים שמגיעות לעמוד. לא העמוד הבעיה כרגע — הצינור ריק.',
+    causes:'תקציב פרסום נמוך / לא יציב · מודעות לא רצות מספיק · אין הפניות לעמוד מהתוכן',
+    tasks:'לבחור ערוץ אחד ולייצר "פוש" שבועי (תקציב / קריאייטיב / CTA חזק יותר) · יעד: Visitors ≥ 50–100',
+    badge:'בעיית תנועה', bcls:'var(--red)'
+  },
+  {
+    icon:'✅📈', title:'Visitors + Leads + Sales — עדיין לא 3–4',
+    signal:'Visitors: 100–150 · Leads: 15–25 · Sales: 2–3',
+    meaning:'המערכת עובדת. יכול להיות מוקדם, או מגבלת קפסיטי, או מחיר מעבר.',
+    causes:'קפסיטי מוגבל (שעות / ליווי) · מחיר לא אופטימלי לשלב הזה',
+    tasks:'לבדוק ריאלית כמה זמן לוקח כל ליווי · לשקול העלאת מחיר או מעבר חלקי לסדנה/קבוצה',
+    badge:'אופטימיזציה', bcls:'var(--grn)'
+  },
+  {
+    icon:'🔥😮‍💨', title:'Sales מגיעות, אבל מרגישה שחוקה',
+    signal:'Coaching_Sales_Total ≈ 3–4 · שעות עבודה משוגעות',
+    meaning:'המספרים טובים אבל אין מערכת. ג\'נגול בין ליווי, תוכן, תשתית — בלי אוטומציה.',
+    causes:'אין תהליכים אוטומטיים · אין גבולות ברורים על זמן · תשתית לא בנויה',
+    tasks:'לבחור משימת תשתית אחת בשבוע שמורידה נטל קבוע: אוטומציה למיילים אחרי פגישה / טמפלטים לתוכן / אייג\'נט לסיכום שיחות',
+    badge:'בעיית תשתית', bcls:'var(--pur)'
+  }
+];
+
+function renderPrinciples(){
+  document.getElementById('principles-grid').innerHTML = PRINCIPLES.map(p=>`
+    <div class="card" style="padding:17px">
+      <div style="font-size:22px;font-weight:900;color:#d0e4ff;line-height:1;margin-bottom:6px">${p.key}</div>
+      <div style="font-size:14px;font-weight:800;margin-bottom:8px">${p.title}</div>
+      <div style="font-size:12.5px;color:var(--txt2);line-height:1.75">${p.body}</div>
+    </div>`).join('');
+
+  document.getElementById('control-board').innerHTML = CONTROL_BOARD.map(c=>`
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="background:${c.bcls};padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;font-weight:800;color:#fff">${c.icon} ${c.title}</span>
+        <span style="font-size:10px;background:rgba(255,255,255,.25);color:#fff;padding:2px 8px;border-radius:10px;font-weight:700">${c.badge}</span>
+      </div>
+      <div style="padding:13px 15px;font-size:12.5px;line-height:1.75">
+        <div style="margin-bottom:7px"><span style="font-weight:800;color:var(--txt2)">📊 אות: </span>${c.signal}</div>
+        <div style="margin-bottom:7px"><span style="font-weight:800;color:var(--txt2)">🔍 פירוש: </span>${c.meaning}</div>
+        <div style="margin-bottom:7px"><span style="font-weight:800;color:var(--txt2)">⚠️ סיבות: </span>${c.causes}</div>
+        <div style="background:#f6f7fb;border-radius:6px;padding:8px 10px;margin-top:8px">
+          <div style="font-size:11px;font-weight:800;color:var(--txt2);margin-bottom:4px">🎯 NEEDLE TASKS:</div>
+          <div>${c.tasks}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════
+function openModal(day){
+  document.getElementById('m-day').value=day;
+  document.getElementById('m-name').value='';
+  document.getElementById('m-time').value='';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('m-name').focus(),80);
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function confirmAdd(){
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){document.getElementById('m-name').focus();return;}
+  const key=weekKey();
+  const wk=getWeek(key);
+  if(!wk.flowTasks)wk.flowTasks=[];
+  wk.flowTasks.push({
+    name, cat:document.getElementById('m-cat').value,
+    day:+document.getElementById('m-day').value,
+    block:document.getElementById('m-block').value,
+    time:document.getElementById('m-time').value,
+    dur:+document.getElementById('m-dur').value, status:'todo'
+  });
+  setWeek(key,wk);
+  closeModal();
+  renderFlow();
+  toast('מטלה נוספה!');
+}
+
+// ══════════════════════════════════════════════════════
+// IMPORT / EXPORT
+// ══════════════════════════════════════════════════════
+function importFile(){document.getElementById('file-input').click();}
+function handleImport(e){
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=async ev=>{
+    try{appData=JSON.parse(ev.target.result);await saveData();renderAll();toast('יובא בהצלחה!');}
+    catch{toast('שגיאה בקובץ JSON');}
+  };
+  r.readAsText(f);
+}
+function exportJSON(){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(appData,null,2)],{type:'application/json'}));
+  a.download='imvest_data_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); toast('יוצא!');
+}
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function stIdx(s){if(typeof s==='number')return s;return{todo:0,progress:1,done:2,blocked:3}[s]??0;}
+function stKey(i){return['todo','progress','done','blocked'][i]||'todo';}
+function otIdx(s){if(typeof s==='number')return s;return{unknown:0,ontrack:1,atrisk:2,offtrack:3}[s]??0;}
+function otKey(i){return['unknown','ontrack','atrisk','offtrack'][i]||'unknown';}
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+function init(){
+  const now=new Date();
+  const dayN=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  document.getElementById('pg-sub').textContent=
+    `יום ${dayN[now.getDay()]}, ${now.getDate()} ${MOS[now.getMonth()]} ${now.getFullYear()}`;
+  // שבת = ערב הספרינט הבא — מציגים את השבוע הבא כברירת מחדל
+  if (now.getDay() === 6) weekOffset = 1;
+  loadData();
+  setInterval(saveAll, 60000);
+}
+init();
+</script>
+</body>
+</html>
