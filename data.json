@@ -1,7 +1,7 @@
 {
   "_readme": "קובץ נתונים של I'mvest Dashboard. עדכני ידנית כל שבוע, או ייצאי מ-Google Sheets ושמרי כ-data.json באותה תיקייה.",
   "_version": "2.0",
-  "lastUpdated": "2026-05-03",
+  "lastUpdated": "2026-05-07",
   "goals": [
     {
       "month": "מאי 2026",
@@ -69,20 +69,20 @@
       },
       "metrics": {
         "visitorsActual": 0,
-        "leadsActual": 0,
-        "callsActual": 0,
+        "leadsActual": 9,
+        "callsActual": 5,
         "salesActual": 0,
         "pageDirectSalesActual": 0,
         "salesFromCallsActual": 0,
         "revenueActual": 0,
-        "adSpendActual": 0,
+        "adSpendActual": 50,
         "instaPostsActual": 0,
         "communityNewActual": 0,
         "communityActiveEventsActual": 0,
         "communityFocusWeek": ""
       },
       "hours": {
-        "coaching": 0,
+        "coaching": 2,
         "content": 0,
         "infra": 0,
         "needleMover": 0,
@@ -98,7 +98,7 @@
         {
           "text": "שכתוב כותרת + פתיח דף מכירה לליווי",
           "detail": "מטרה: 1–2 רכישות ישירות מהעמוד. מדידה: גרסה חי באוויר.",
-          "status": "todo",
+          "status": "done",
           "priority": 2
         },
         {
