@@ -849,20 +849,32 @@ async function loadData() {
     if (el) embedded = JSON.parse(el.textContent);
   } catch {}
 
-  // 4. מיזוג: base = data.json או embedded, lsData תמיד מנצח לשבועות שנשמרו
+  // 4. מיזוג: השווה תאריכי עדכון — מי חדש יותר מנצח
   const base = fileData || embedded || {goals: defGoals(), weeks: {}};
 
-  if (lsData) {
-    // localStorage קיים — הוא הבסיס. data.json ממלא רק שבועות חסרים
+  const lsDate   = lsData?.lastUpdated   || '0000-00-00';
+  const fileDate = fileData?.lastUpdated || '0000-00-00';
+  const fileIsNewer = fileDate > lsDate;
+
+  if (lsData && !fileIsNewer) {
+    // localStorage עדכני יותר — הוא הבסיס. data.json ממלא שבועות חסרים בלבד
     appData = { ...base, ...lsData };
     appData.weeks = { ...base.weeks, ...(lsData.weeks || {}) };
     if (!appData.goals) appData.goals = base.goals || defGoals();
     const ts = lsData.lastUpdated ? ' · עודכן ' + lsData.lastUpdated : '';
     setDataStatus('ok', 'נתונים שמורים נטענו בהצלחה' + ts);
   } else {
-    // אין localStorage — השתמש ב-data.json / embedded
+    // data.json חדש יותר (או אין localStorage) — קח מ-data.json
     appData = base;
-    setDataStatus('warn', fileData ? 'נטען מ-data.json · שינויים יישמרו אוטומטית' : 'נטען מנתונים מוטמעים');
+    if (lsData?.weeks) {
+      // השמר שבועות שהמשתמשת ערכה ואינם ב-data.json
+      Object.keys(lsData.weeks).forEach(k => {
+        if (!appData.weeks[k]) appData.weeks[k] = lsData.weeks[k];
+      });
+    }
+    localStorage.setItem('imvest_data_v2', JSON.stringify(appData));
+    const ts = base.lastUpdated ? ' · עודכן ' + base.lastUpdated : '';
+    setDataStatus('ok', 'נטען מ-data.json' + ts);
   }
 
   renderAll();
