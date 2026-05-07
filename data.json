@@ -1,6 +1,7 @@
 {
   "_readme": "קובץ נתונים של I'mvest Dashboard. עדכני ידנית כל שבוע, או ייצאי מ-Google Sheets ושמרי כ-data.json באותה תיקייה.",
   "_version": "2.0",
+  "_deployVersion": 2,
   "lastUpdated": "2026-05-07",
   "goals": [
     {

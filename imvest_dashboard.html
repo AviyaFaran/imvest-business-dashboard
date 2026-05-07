@@ -849,25 +849,24 @@ async function loadData() {
     if (el) embedded = JSON.parse(el.textContent);
   } catch {}
 
-  // 4. מיזוג: השווה תאריכי עדכון — מי חדש יותר מנצח
+  // 4. מיזוג לפי _deployVersion — גרסה שאני שולטת בה, לא תאריך
   const base = fileData || embedded || {goals: defGoals(), weeks: {}};
 
-  const lsDate   = lsData?.lastUpdated   || '0000-00-00';
-  const fileDate = fileData?.lastUpdated || '0000-00-00';
-  const fileIsNewer = fileDate > lsDate;
+  const fileVer = fileData?._deployVersion || 0;
+  const lsVer   = lsData?._deployVersion   || 0;
+  const serverIsNewer = fileVer > lsVer;
 
-  if (lsData && !fileIsNewer) {
-    // localStorage עדכני יותר — הוא הבסיס. data.json ממלא שבועות חסרים בלבד
+  if (lsData && !serverIsNewer) {
+    // localStorage מעודכן — המשתמשת עבדה כאן. data.json ממלא שבועות חסרים בלבד
     appData = { ...base, ...lsData };
     appData.weeks = { ...base.weeks, ...(lsData.weeks || {}) };
     if (!appData.goals) appData.goals = base.goals || defGoals();
     const ts = lsData.lastUpdated ? ' · עודכן ' + lsData.lastUpdated : '';
-    setDataStatus('ok', 'נתונים שמורים נטענו בהצלחה' + ts);
+    setDataStatus('ok', 'נתונים שמורים נטענו' + ts);
   } else {
-    // data.json חדש יותר (או אין localStorage) — קח מ-data.json
+    // data.json חדש יותר (גרסה גבוהה יותר) — טוען מהשרת ומעדכן localStorage
     appData = base;
     if (lsData?.weeks) {
-      // השמר שבועות שהמשתמשת ערכה ואינם ב-data.json
       Object.keys(lsData.weeks).forEach(k => {
         if (!appData.weeks[k]) appData.weeks[k] = lsData.weeks[k];
       });
